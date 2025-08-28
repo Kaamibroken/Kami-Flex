@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kami Flex | Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+    }
+    .login-container {
+      width: 300px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .login-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .login-header h2 {
+      font-size: 24px;
+      font-weight: bold;
+      color: #3498db;
+    }
+    .login-header a {
+      text-decoration: none;
+      color: #3498db;
+    }
+    .input-field {
+      margin-bottom: 20px;
+    }
+    .input-field input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .login-btn {
+      width: 100%;
+      padding: 10px;
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .login-btn:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-header">
+      <h2><a href="index.html">Kami Flex</a></h2>
+      <p>Login to your account</p>
+    </div>
+    <form action="home.html">
+      <div class="input-field">
+        <input type="email" placeholder="Email Address" required>
+      </div>
+      <div class="input-field">
+        <input type="password" placeholder="Password" required>
+      </div>
+      <button class="login-btn">Login</button>
+    </form>
+    <p style="text-align: center; margin-top: 20px;">Don't have an account? <a href="signup.html">Sign Up</a></p>
+  </div>
+</body>
+</html>
+
+

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kami Flex | Sign Up</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+    }
+    .signup-container {
+      width: 300px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .signup-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .signup-header h2 {
+      font-size: 24px;
+      font-weight: bold;
+      color: #3498db;
+    }
+    .signup-header a {
+      text-decoration: none;
+      color: #3498db;
+    }
+    .input-field {
+      margin-bottom: 20px;
+    }
+    .input-field input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .signup-btn {
+      width: 100%;
+      padding: 10px;
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .signup-btn:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <div class="signup-container">
+    <div class="signup-header">
+      <h2><a href="index.html">Kami Flex</a></h2>
+      <p>Create an account</p>
+    </div>
+    <form action="signup-complete.html">
+      <div class="input-field">
+        <input type="text" placeholder="Full Name" required>
+      </div>
+      <div class="input-field">
+        <input type="email" placeholder="Email Address" required>
+      </div>
+      <div class="input-field">
+        <input type="password" placeholder="Password" required>
+      </div>
+      <div class="input-field">
+        <input type="password" placeholder="Confirm Password" required>
+      </div>
+      <button class="signup-btn">Sign Up</button>
+    </form>
+    <p style="text-align: center; margin-top: 20px;">Already have an account? <a href="login.html">Login</a></p>
+  </div>
+</body>
+</html>
+
+

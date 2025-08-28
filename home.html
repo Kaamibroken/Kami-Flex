@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kami Flex | Home</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+    }
+    .home-container {
+      width: 80%;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .home-header {
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .home-header h1 {
+      font-size: 36px;
+      font-weight: bold;
+      background: linear-gradient(to right, #34A85A, #ff69b4, #ffe135);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: color-change 5s infinite;
+    }
+    @keyframes color-change {
+      0% {
+        background: linear-gradient(to right, #34A85A, #ff69b4, #ffe135);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      50% {
+        background: linear-gradient(to right, #ff69b4, #ffe135, #34A85A);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      100% {
+        background: linear-gradient(to right, #ffe135, #34A85A, #ff69b4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    }
+    .menu-icon {
+      position: absolute;
+      top: 0;
+      right: 0;
+      font-size: 30px;
+      cursor: pointer;
+    }
+    .side-menu {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 250px;
+      height: 100vh;
+      background-color: #fff;
+      border-left: 1px solid #ddd;
+      padding: 20px;
+      display: none;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .side-menu ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .side-menu li {
+      margin-bottom: 20px;
+    }
+    .side-menu a {
+      text-decoration: none;
+      color: #337ab7;
+    }
+    .side-menu a:hover {
+      color: #23527c;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="home-container">
+    <div class="home-header">
+      <h1>Kami Flex</h1>
+      <h2>Welcome to your home page!</h2>
+      <div class="menu-icon" onclick="document.getElementById('side-menu').style.display='block'">&#9776;</div>
+      <div id="side-menu" class="side-menu">
+        <span class="close-btn" onclick="document.getElementById('side-menu').style.display='none'">&times;</span>
+        <ul>
+          <li><a href="Profile.html">Profile</a></li>
+          <li><a href="https:                                                            
+          <li><a href="login.html" onclick="logout()">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <script>
+    function logout() {
+      // Add your logout logic here
+      window.location.href = 'login.html';
+    }
+  </script>
+</body>
+</html>
+
+
+
+

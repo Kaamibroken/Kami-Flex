@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Kami Flex — Temp Mail</title>
   <style>
+    /* Simple styling — aap change kar sakte hain */
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans",sans-serif;background:#0b1020;color:#eef2ff;display:flex;flex-direction:column;align-items:center;padding:18px}
     .card{width:100%;max-width:920px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.5)}
     h1{margin:0 0 10px;font-size:22px}
@@ -19,6 +20,7 @@
     .notice{padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;margin-top:10px;color:#ffd; border:1px solid rgba(255,255,255,0.03)}
     .small{font-size:13px;color:#cfe;}
     .muted{color:#9fb;}
+    .top-actions{margin-top:12px}
   </style>
 </head>
 <body>
@@ -31,11 +33,15 @@
       <div id="loader">⏳ لوڈ ہو رہا ہے...</div>
     </div>
 
-    <div class="row" style="margin-top:14px">
+    <div class="top-actions row" style="margin-top:14px">
       <button id="refreshInbox">Inbox تازہ کریں</button>
       <button id="clearBtn" class="secondary">خالی کریں</button>
       <div style="flex:1"></div>
       <div class="small muted">API پروکسی: <strong>/api/index.js</strong></div>
+    </div>
+
+    <div id="infoBox" class="notice" style="display:block;margin-top:12px">
+      براہِ کرم پہلے <strong>Generate</strong> بٹن دبائیں، پھر <strong>Inbox</strong> دیکھیں۔ اگر کوئی پیغام نہیں تو "No messages" دکھے گا۔
     </div>
 
     <h3 style="margin-top:18px">📥 Inbox</h3>
@@ -46,44 +52,64 @@
   </div>
 
 <script>
+/*
+  index.html — browser-side logic
+  Ye file /api/index.js ko call karegi:
+   - /api/generate
+   - /api/inbox?email=...
+   - /api/message?email=...&messageid=...
+*/
+
 let currentEmail = "";
 
+// helper: show loader
 function setLoading(on){
   document.getElementById('loader').style.display = on? 'inline-block':'none';
 }
 
-// generate email
+// generate
 document.getElementById('generateBtn').addEventListener('click', async ()=>{
   setLoading(true);
+  document.getElementById('emailBox').innerText = 'Generating...';
+  document.getElementById('infoBox').style.display='none';
   try{
     const res = await fetch('/api/index?op=generate');
     const data = await res.json();
     if(data && data.email){
       currentEmail = data.email;
       document.getElementById('emailBox').innerText = '📧 ' + currentEmail;
-      await navigator.clipboard.writeText(currentEmail).catch(()=>{});
-      loadInbox();
+      // auto copy
+      try{ await navigator.clipboard.writeText(currentEmail); } catch(e){}
+      loadInbox(); // auto load inbox once generated
     } else {
       document.getElementById('emailBox').innerText = '❌ Generate failed';
+      document.getElementById('infoBox').innerText = 'Generate ناکام — دوبارہ کوشش کریں۔'
+      document.getElementById('infoBox').style.display='block';
     }
   }catch(err){
-    document.getElementById('emailBox').innerText = '⚠️ Error: '+err.message;
+    document.getElementById('emailBox').innerText = '⚠️ Error';
+    document.getElementById('infoBox').innerText = 'نیٹ ورک ایرر: '+ (err.message || err);
+    document.getElementById('infoBox').style.display='block';
   } finally { setLoading(false); }
 });
 
-// copy
+// copy button
 document.getElementById('copyBtn').addEventListener('click', async ()=>{
-  if(!currentEmail) return alert('پہلے Generate کریں');
-  await navigator.clipboard.writeText(currentEmail).catch(()=>{});
-  alert("Copied: "+currentEmail);
+  if(!currentEmail){ alert('پہلے Generate کریں'); return; }
+  try{
+    await navigator.clipboard.writeText(currentEmail);
+    alert('Copied: ' + currentEmail);
+  }catch(e){ alert('Clipboard failed'); }
 });
 
 // clear
 document.getElementById('clearBtn').addEventListener('click', ()=>{
-  currentEmail="";
-  document.getElementById('emailBox').innerText='براۓ مہربانی پہلا "Generate" کریں';
-  document.getElementById('inbox').innerHTML='<li class="muted small">Inbox خالی</li>';
-  document.getElementById('messageContent').innerText="پیغام یہاں دکھے گا";
+  currentEmail='';
+  document.getElementById('emailBox').innerText = 'براۓ مہربانی پہلا "Generate" کریں';
+  document.getElementById('inbox').innerHTML = '<li class="muted small">Inbox خالی</li>';
+  document.getElementById('messageContent').innerText = 'پیغام یہاں دکھے گا';
+  document.getElementById('infoBox').style.display='block';
+  document.getElementById('infoBox').innerText='Cleared.';
 });
 
 // refresh inbox
@@ -91,39 +117,57 @@ document.getElementById('refreshInbox').addEventListener('click', ()=> loadInbox
 
 // load inbox
 async function loadInbox(){
-  if(!currentEmail) return;
-  const inboxEl=document.getElementById('inbox');
-  inboxEl.innerHTML='<li class="muted small">⏳ Loading...</li>';
+  const inboxEl = document.getElementById('inbox');
+  const messageEl = document.getElementById('messageContent');
+  if(!currentEmail){
+    inboxEl.innerHTML = '<li class="muted small">📭 پہلے ای میل بنائیں</li>';
+    return;
+  }
+  inboxEl.innerHTML = '<li class="muted small">⏳ Loading inbox...</li>';
+  messageEl.innerText = 'پیغام یہاں دکھے گا';
   try{
-    const res=await fetch('/api/index?op=inbox&email='+encodeURIComponent(currentEmail));
-    const data=await res.json();
+    const res = await fetch('/api/index?op=inbox&email='+encodeURIComponent(currentEmail));
+    const data = await res.json();
     if(Array.isArray(data) && data.length>0){
-      inboxEl.innerHTML="";
+      inboxEl.innerHTML = '';
       data.forEach(msg=>{
-        const li=document.createElement('li');
-        li.innerText=`From: ${msg.from} — Subject: ${msg.subject}`;
-        li.onclick=()=> loadMessage(msg.id);
+        const li = document.createElement('li');
+        li.innerText = `From: ${msg.from || '---'}  —  Subject: ${msg.subject || 'No subject'}`;
+        li.onclick = ()=> loadMessage(msg.id);
         inboxEl.appendChild(li);
       });
-    }else{
-      inboxEl.innerHTML='<li class="muted small">📭 No messages</li>';
+    } else {
+      inboxEl.innerHTML = '<li class="muted small">📭 No messages</li>';
     }
   }catch(err){
-    inboxEl.innerHTML='<li class="muted small">⚠️ Error loading inbox</li>';
+    inboxEl.innerHTML = '<li class="muted small">⚠️ Inbox load error</li>';
   }
 }
 
 // load single message
 async function loadMessage(id){
-  const messageEl=document.getElementById('messageContent');
-  messageEl.innerText="⏳ Loading...";
+  if(!currentEmail) return alert('پہلے ای میل بنائیں');
+  const messageEl = document.getElementById('messageContent');
+  messageEl.innerText = '⏳ Loading message...';
   try{
-    const res=await fetch('/api/index?op=message&email='+encodeURIComponent(currentEmail)+'&messageid='+id);
-    const data=await res.json();
-    messageEl.innerText=data.text || data.body || "⚠️ No content";
+    const res = await fetch('/api/index?op=message&email='+encodeURIComponent(currentEmail)+'&messageid='+encodeURIComponent(id));
+    const data = await res.json();
+    // data may contain text or html fields depending on API
+    if(data && (data.text || data.html || data.body)){
+      messageEl.innerText = data.text || data.body || (data.html? stripTags(data.html):'No content');
+    }else{
+      messageEl.innerText = '⚠️ Message not found';
+    }
   }catch(err){
-    messageEl.innerText="⚠️ Error loading message";
+    messageEl.innerText = '⚠️ Message load error';
   }
+}
+
+// helper to strip HTML (simple)
+function stripTags(html){
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return div.textContent || div.innerText || '';
 }
 </script>
 </body>

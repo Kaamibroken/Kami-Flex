@@ -1,106 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kami Flex Temp Mail</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kami Flex — Temp Mail</title>
+  <style>
+    body{font-family:Arial, sans-serif;background:#0d1117;color:#f0f6fc;margin:0;padding:20px;display:flex;justify-content:center}
+    .card{width:100%;max-width:800px;background:#161b22;padding:20px;border-radius:12px;box-shadow:0 0 20px rgba(0,0,0,0.5)}
+    h1{margin:0 0 15px;color:#58a6ff}
+    button{background:#238636;color:white;border:none;padding:10px 14px;border-radius:6px;cursor:pointer;margin-right:10px}
+    button.secondary{background:#30363d;color:#c9d1d9}
+    #emailBox{padding:10px;background:#21262d;border-radius:6px;min-width:240px;margin-bottom:10px}
+    #loader{display:none;margin-top:10px}
+    ul{list-style:none;padding:0;margin:10px 0}
+    li{padding:8px;border-bottom:1px solid #30363d;cursor:pointer}
+    li:hover{background:#21262d}
+    #messageContent{padding:12px;background:#0d1117;border:1px solid #30363d;border-radius:6px;min-height:120px;margin-top:12px;white-space:pre-wrap}
+  </style>
 </head>
-<body style="font-family:sans-serif; background:#f0f2f5; margin:0; padding:20px;">
+<body>
+  <div class="card">
+    <h1>📧 Kami Flex — Temp Mail</h1>
 
-  <h2 style="text-align:center;">📧 Temp Mail Service</h2>
+    <div id="emailBox">Click Generate to get email</div>
+    <button id="generateBtn">Generate</button>
+    <button id="copyBtn" class="secondary">Copy</button>
+    <div id="loader">⏳ Loading...</div>
 
-  <!-- Email Generate -->
-  <div style="text-align:center; margin:20px;">
-    <button id="generateBtn" style="padding:10px 20px; font-size:16px;">Generate Email</button>
-    <div id="loader" style="display:none; margin-top:10px;">⏳ Generating...</div>
-    <div id="emailBox" style="margin-top:10px; font-weight:bold; color:green;"></div>
-  </div>
+    <div style="margin-top:20px">
+      <button id="refreshInbox">Refresh Inbox</button>
+      <button id="clearBtn" class="secondary">Clear</button>
+    </div>
 
-  <!-- Inbox Section -->
-  <h3>📨 Inbox</h3>
-  <ul id="inbox" style="background:white; padding:10px; border-radius:8px; list-style:none; min-height:100px;">
-    <li style="text-align:center; color:gray;">📭 No messages</li>
-  </ul>
+    <h3>📥 Inbox</h3>
+    <ul id="inbox"><li>No messages yet</li></ul>
 
-  <!-- Message Section -->
-  <h3>📩 Message</h3>
-  <div id="messageContent" style="background:white; padding:15px; border-radius:8px; min-height:100px;">
-    Select a message to view
+    <h3>📨 Message</h3>
+    <div id="messageContent">Message will appear here</div>
   </div>
 
 <script>
 let currentEmail = "";
 
-// Generate Email
-document.getElementById("generateBtn").addEventListener("click", async () => {
-  document.getElementById("loader").style.display = "block";
-  document.getElementById("emailBox").innerText = "";
+// Loader
+function setLoading(on){
+  document.getElementById("loader").style.display = on ? "block" : "none";
+}
 
+// Generate
+document.getElementById("generateBtn").addEventListener("click", async ()=>{
+  setLoading(true);
   try {
-    const res = await fetch("/api/tempmail?action=generate");
+    const res = await fetch("/api/index?op=generate");
     const data = await res.json();
-
-    if (data.email) {
+    if(data.email){
       currentEmail = data.email;
       document.getElementById("emailBox").innerText = "📧 " + currentEmail;
-
-      navigator.clipboard.writeText(currentEmail);
-      alert("Copied: " + currentEmail);
-
+      await navigator.clipboard.writeText(currentEmail).catch(()=>{});
       loadInbox();
     }
-  } catch (err) {
-    alert("⚠️ Error generating email");
+  } catch(e){
+    alert("Error generating email");
+  } finally {
+    setLoading(false);
   }
-
-  document.getElementById("loader").style.display = "none";
 });
 
+// Copy
+document.getElementById("copyBtn").addEventListener("click", async ()=>{
+  if(!currentEmail) return alert("Generate first");
+  await navigator.clipboard.writeText(currentEmail);
+  alert("Copied: " + currentEmail);
+});
+
+// Clear
+document.getElementById("clearBtn").addEventListener("click", ()=>{
+  currentEmail="";
+  document.getElementById("emailBox").innerText="Click Generate to get email";
+  document.getElementById("inbox").innerHTML="<li>No messages</li>";
+  document.getElementById("messageContent").innerText="Message will appear here";
+});
+
+// Refresh Inbox
+document.getElementById("refreshInbox").addEventListener("click", ()=> loadInbox());
+
 // Load Inbox
-async function loadInbox() {
-  if (!currentEmail) return;
-
-  const inbox = document.getElementById("inbox");
-  inbox.innerHTML = "<li style='text-align:center;'>⏳ Loading...</li>";
-
+async function loadInbox(){
+  if(!currentEmail) return;
+  const inboxEl = document.getElementById("inbox");
+  inboxEl.innerHTML="<li>⏳ Loading inbox...</li>";
   try {
-    const res = await fetch(`/api/tempmail?action=inbox&email=${currentEmail}`);
+    const res = await fetch("/api/index?op=inbox&email="+encodeURIComponent(currentEmail));
     const data = await res.json();
-
-    inbox.innerHTML = "";
-    if (data && data.length > 0) {
-      data.forEach(msg => {
-        const li = document.createElement("li");
-        li.style.padding = "8px";
-        li.style.cursor = "pointer";
-        li.innerText = `📨 ${msg.from} | ${msg.subject}`;
-        li.onclick = () => loadMessage(msg.id);
-        inbox.appendChild(li);
+    if(data.length){
+      inboxEl.innerHTML="";
+      data.forEach(msg=>{
+        const li=document.createElement("li");
+        li.innerText=`From: ${msg.from} — ${msg.subject}`;
+        li.onclick=()=> loadMessage(msg.id);
+        inboxEl.appendChild(li);
       });
     } else {
-      inbox.innerHTML = "<li style='text-align:center;'>📭 Empty Inbox</li>";
+      inboxEl.innerHTML="<li>No messages</li>";
     }
-  } catch {
-    inbox.innerHTML = "<li style='text-align:center;'>⚠️ Error loading inbox</li>";
+  } catch(e){
+    inboxEl.innerHTML="<li>Error loading inbox</li>";
   }
 }
 
 // Load Message
-async function loadMessage(id) {
-  const box = document.getElementById("messageContent");
-  box.innerText = "⏳ Loading...";
-
+async function loadMessage(id){
+  const msgEl=document.getElementById("messageContent");
+  msgEl.innerText="⏳ Loading...";
   try {
-    const res = await fetch(`/api/tempmail?action=message&email=${currentEmail}&id=${id}`);
-    const data = await res.json();
-    box.innerText = data.text || "⚠️ No content";
-  } catch {
-    box.innerText = "⚠️ Error loading message";
+    const res=await fetch(`/api/index?op=message&email=${encodeURIComponent(currentEmail)}&messageid=${encodeURIComponent(id)}`);
+    const data=await res.json();
+    msgEl.innerText=data.text || data.body || "No content";
+  } catch(e){
+    msgEl.innerText="Error loading message";
   }
 }
-
-// Auto refresh inbox
-setInterval(loadInbox, 10000);
 </script>
 </body>
 </html>

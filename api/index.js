@@ -1,32 +1,28 @@
-// api/index.js
 export default async function handler(req, res) {
-  const { query } = req;
-  const op = query.op;
-  const key = process.env.PRINCE_KEY || "prince";
+  const { action, email, id } = req.query;
+  const API_KEY = "prince";
 
   try {
-    if (op === "generate") {
-      const r = await fetch(`https://api.princetechn.com/api/tempmail/generate?apikey=${key}`);
-      const j = await r.json();
-      return res.status(200).json(j);
+    if (action === "generate") {
+      const r = await fetch(`https://api.princetechn.com/api/tempmail/generate?apikey=${API_KEY}`);
+      const d = await r.json();
+      return res.status(200).json(d);
     }
 
-    if (op === "inbox") {
-      const email = query.email;
-      const r = await fetch(`https://api.princetechn.com/api/tempmail/inbox?apikey=${key}&email=${email}`);
-      const j = await r.json();
-      return res.status(200).json(j);
+    if (action === "inbox") {
+      const r = await fetch(`https://api.princetechn.com/api/tempmail/inbox?apikey=${API_KEY}&email=${email}`);
+      const d = await r.json();
+      return res.status(200).json(d);
     }
 
-    if (op === "message") {
-      const { email, messageid } = query;
-      const r = await fetch(`https://api.princetechn.com/api/tempmail/message?apikey=${key}&email=${email}&messageid=${messageid}`);
-      const j = await r.json();
-      return res.status(200).json(j);
+    if (action === "message") {
+      const r = await fetch(`https://api.princetechn.com/api/tempmail/message?apikey=${API_KEY}&email=${email}&messageid=${id}`);
+      const d = await r.json();
+      return res.status(200).json(d);
     }
 
-    res.status(400).json({ error: "Invalid operation" });
+    res.status(400).json({ error: "Invalid action" });
   } catch (e) {
-    res.status(500).json({ error: "Server error", detail: String(e) });
+    res.status(500).json({ error: "Server Error", detail: e.message });
   }
 }

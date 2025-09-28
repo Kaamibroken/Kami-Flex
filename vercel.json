@@ -1,9 +1,15 @@
 {
   "version": 2,
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/index.js"
-    }
+  "builds": [
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "script.js", "use": "@vercel/static" },
+    { "src": "api/*.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/", "dest": "/index.html" },
+    { "src": "/api/otp", "dest": "/api/otp.js" },
+    { "src": "/api/number", "dest": "/api/number.js" },
+    { "src": "/api/countries", "dest": "/api/countries.js" },
+    { "src": "/api/carriers", "dest": "/api/carriers.js" }
   ]
 }

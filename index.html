@@ -3,17 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fake Number Service</title>
+  <title>Kami Flex Fake Number</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h1>📱 Fake Number Service</h1>
-  
-  <button onclick="getOtp()">Get OTP</button>
-  <button onclick="getNumber()">Get Number</button>
-  <button onclick="getCountries()">Get Countries</button>
-  <button onclick="getCarriers()">Get Carriers</button>
+<body class="bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 min-h-screen flex flex-col items-center justify-center text-white font-sans">
 
-  <pre id="output"></pre>
+  <div class="bg-white/10 backdrop-blur-md rounded-2xl shadow-xl p-8 w-11/12 max-w-2xl text-center">
+    <h1 class="text-3xl font-bold mb-6">📱 Kami Flex Fake Number Service</h1>
+    
+    <div class="grid grid-cols-2 gap-4 mb-6">
+      <button onclick="getOtp()" class="bg-purple-700 hover:bg-purple-800 p-3 rounded-xl shadow-md">🔑 Get OTP</button>
+      <button onclick="getNumber()" class="bg-blue-600 hover:bg-blue-700 p-3 rounded-xl shadow-md">📞 Get Number</button>
+      <button onclick="getCountries()" class="bg-green-600 hover:bg-green-700 p-3 rounded-xl shadow-md">🌍 Get Countries</button>
+      <button onclick="getCarriers()" class="bg-orange-600 hover:bg-orange-700 p-3 rounded-xl shadow-md">📡 Get Carriers</button>
+    </div>
+
+    <div class="bg-black/60 p-4 rounded-xl text-left overflow-auto max-h-80">
+      <pre id="output" class="text-sm whitespace-pre-wrap"></pre>
+    </div>
+  </div>
+
+  <footer class="mt-6 text-sm opacity-80">
+    ⚡ Powered by Kami Flex
+  </footer>
 
   <script src="script.js"></script>
 </body>

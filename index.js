@@ -6,14 +6,13 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
   document.getElementById("emailBox").innerText = "Generating...";
 
   try {
-    const res = await fetch("https://api.princetechn.com/api/tempmail/generate?apikey=prince");
+    const res = await fetch("/api/temp?type=generate");
     const data = await res.json();
 
     if (data.email) {
       currentEmail = data.email;
       document.getElementById("emailBox").innerText = "📧 " + currentEmail;
 
-      // Copy to clipboard
       navigator.clipboard.writeText(currentEmail);
       alert("Email copied: " + currentEmail);
     } else {
@@ -32,7 +31,7 @@ async function loadInbox() {
   const infoBox = document.getElementById("infoBox");
 
   if (!currentEmail) {
-    infoBox.style.display = "block"; // Show warning box
+    infoBox.style.display = "block";
     inbox.innerHTML = "<li style='padding:10px; text-align:center;'>📭 No messages</li>";
     return;
   } else {
@@ -42,7 +41,7 @@ async function loadInbox() {
   inbox.innerHTML = "<li style='padding:10px; text-align:center;'>⏳ Loading...</li>";
 
   try {
-    const res = await fetch(`https://api.princetechn.com/api/tempmail/inbox?apikey=prince&email=${currentEmail}`);
+    const res = await fetch(`/api/temp?type=inbox&email=${currentEmail}`);
     const data = await res.json();
 
     if (data && data.length > 0) {
@@ -72,7 +71,7 @@ async function loadMessage(id) {
   messageBox.innerText = "⏳ Loading message...";
 
   try {
-    const res = await fetch(`https://api.princetechn.com/api/tempmail/message?apikey=prince&email=${currentEmail}&messageid=${id}`);
+    const res = await fetch(`/api/temp?type=message&email=${currentEmail}&messageid=${id}`);
     const data = await res.json();
 
     if (data && data.text) {

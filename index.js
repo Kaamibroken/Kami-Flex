@@ -1,24 +1,86 @@
-import express from "express";
-import fetch from "node-fetch";
+let currentEmail = "";
 
-const app = express();
+// Generate Email
+document.getElementById("generateBtn").addEventListener("click", async () => {
+  document.getElementById("loader").style.display = "block";
+  document.getElementById("emailBox").innerText = "Generating...";
 
-app.get("/", (req, res) => {
-  res.send("✅ Kami Flex SIM Database API is working!");
-});
-
-app.get("/api/search", async (req, res) => {
   try {
-    const phone = req.query.phone;
-    if (!phone) {
-      return res.status(400).json({ error: "Phone number is required" });
+    const res = await fetch("https://api.princetechn.com/api/tempmail/generate?apikey=prince");
+    const data = await res.json();
+
+    if (data.email) {
+      currentEmail = data.email;
+      document.getElementById("emailBox").innerText = "📧 " + currentEmail;
+
+      // Copy to clipboard
+      navigator.clipboard.writeText(currentEmail);
+      alert("Email copied: " + currentEmail);
+    } else {
+      document.getElementById("emailBox").innerText = "❌ Failed to generate";
     }
-    const response = await fetch(`https://api.impossible-world.xyz/api/data?phone=${phone}`);
-    const data = await response.json();
-    res.json(data);
   } catch (err) {
-    res.status(500).json({ error: "Server Error", details: err.message });
+    document.getElementById("emailBox").innerText = "⚠️ Error: " + err.message;
   }
+
+  document.getElementById("loader").style.display = "none";
 });
 
-export default app;
+// Load Inbox
+async function loadInbox() {
+  const inbox = document.getElementById("inbox");
+  const infoBox = document.getElementById("infoBox");
+
+  if (!currentEmail) {
+    infoBox.style.display = "block"; // Show warning box
+    inbox.innerHTML = "<li style='padding:10px; text-align:center;'>📭 No messages</li>";
+    return;
+  } else {
+    infoBox.style.display = "none";
+  }
+
+  inbox.innerHTML = "<li style='padding:10px; text-align:center;'>⏳ Loading...</li>";
+
+  try {
+    const res = await fetch(`https://api.princetechn.com/api/tempmail/inbox?apikey=prince&email=${currentEmail}`);
+    const data = await res.json();
+
+    if (data && data.length > 0) {
+      inbox.innerHTML = "";
+      data.forEach(msg => {
+        const li = document.createElement("li");
+        li.style.padding = "10px";
+        li.style.borderBottom = "1px solid gray";
+        li.style.cursor = "pointer";
+        li.innerText = `📨 From: ${msg.from} | Subject: ${msg.subject}`;
+        li.onclick = () => loadMessage(msg.id);
+        inbox.appendChild(li);
+      });
+    } else {
+      inbox.innerHTML = "<li style='padding:10px; text-align:center;'>📭 No messages</li>";
+    }
+  } catch (err) {
+    inbox.innerHTML = "<li style='padding:10px; text-align:center;'>⚠️ Error loading inbox</li>";
+  }
+}
+
+// Load Single Message
+async function loadMessage(id) {
+  if (!currentEmail) return;
+
+  const messageBox = document.getElementById("messageContent");
+  messageBox.innerText = "⏳ Loading message...";
+
+  try {
+    const res = await fetch(`https://api.princetechn.com/api/tempmail/message?apikey=prince&email=${currentEmail}&messageid=${id}`);
+    const data = await res.json();
+
+    if (data && data.text) {
+      messageBox.innerText = data.text;
+    } else {
+      messageBox.innerText = "⚠️ Message not found!";
+    }
+  } catch (err) {
+    messageBox.innerText = "⚠️ Error loading message!";
+  }
+}

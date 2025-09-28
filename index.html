@@ -1,166 +1,130 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ur">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kami Flex Temp Mail</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kami Flex — Temp Mail</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
-
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
-      background: linear-gradient(270deg, #0b1d3a, #0a3a2b, #3a3a0b, #1a1a1a);
-      background-size: 800% 800%;
-      animation: gradientBG 15s ease infinite;
-      color: white;
-      padding: 20px;
-    }
-
-    @keyframes gradientBG {
-      0% {background-position:0% 50%;}
-      25% {background-position:50% 50%;}
-      50% {background-position:100% 50%;}
-      75% {background-position:50% 50%;}
-      100% {background-position:0% 50%;}
-    }
-
-    .welcome {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2rem;
-      margin: 20px 0;
-      text-align: center;
-      background: linear-gradient(45deg, #00f, #0f0, #ff0, #0ff, #f0f);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: colorText 5s linear infinite;
-    }
-
-    @keyframes colorText {
-      0% {background-position:0% 50%;}
-      50% {background-position:100% 50%;}
-      100% {background-position:0% 50%;}
-    }
-
-    .btn {
-      padding: 12px 25px;
-      font-size: 1rem;
-      font-weight: bold;
-      color: white;
-      background: #0b3a66;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin: 10px;
-    }
-
-    .btn:hover {
-      background: #00509e;
-      transform: scale(1.05);
-    }
-
-    #emailBox {
-      margin: 15px 0;
-      padding: 12px 25px;
-      background: rgba(0,0,0,0.4);
-      border-radius: 8px;
-      border: 2px solid #fff;
-      text-align: center;
-      font-size: 1.1rem;
-      min-width: 280px;
-    }
-
-    #loader {
-      display: none;
-      margin: 10px;
-      font-size: 1.1rem;
-      color: yellow;
-    }
-
-    .section {
-      width: 100%;
-      max-width: 600px;
-      margin-top: 20px;
-      background: rgba(0,0,0,0.4);
-      border-radius: 10px;
-      border: 2px solid #0b3a66;
-      padding: 15px;
-    }
-
-    .section h2 {
-      margin-top: 0;
-      font-size: 1.4rem;
-      text-align: center;
-      color: #ffeb3b;
-    }
-
-    #inbox {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-
-    #inbox li {
-      padding: 10px;
-      border-bottom: 1px solid gray;
-      cursor: pointer;
-    }
-
-    #inbox li:hover {
-      background: rgba(255,255,255,0.1);
-    }
-
-    #infoBox {
-      display: none;
-      margin: 10px 0;
-      padding: 10px;
-      background: rgba(255,0,0,0.2);
-      border: 1px solid red;
-      border-radius: 8px;
-      text-align: center;
-      color: #ffb3b3;
-    }
-
-    #messageContent {
-      padding: 10px;
-      background: rgba(0,0,0,0.6);
-      border-radius: 8px;
-      border: 1px solid #0b3a66;
-      min-height: 100px;
-      white-space: pre-wrap;
-    }
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans",sans-serif;background:#0b1020;color:#eef2ff;display:flex;flex-direction:column;align-items:center;padding:18px}
+    .card{width:100%;max-width:920px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.5)}
+    h1{margin:0 0 10px;font-size:22px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    button{background:#5b6cff;color:white;border:0;padding:10px 14px;border-radius:8px;cursor:pointer}
+    button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.12)}
+    #emailBox{background:rgba(0,0,0,0.25);padding:10px;border-radius:8px;min-width:220px}
+    #loader{display:none;margin-left:10px}
+    #inbox{list-style:none;padding:0;margin:12px 0;border-top:1px solid rgba(255,255,255,0.04)}
+    #inbox li{padding:10px;border-bottom:1px solid rgba(255,255,255,0.02);cursor:pointer}
+    #messageContent{white-space:pre-wrap;padding:12px;background:rgba(0,0,0,0.12);border-radius:8px;margin-top:12px;min-height:120px}
+    .notice{padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;margin-top:10px;color:#ffd; border:1px solid rgba(255,255,255,0.03)}
+    .small{font-size:13px;color:#cfe;}
+    .muted{color:#9fb;}
   </style>
 </head>
 <body>
+  <div class="card">
+    <h1>🎯 Kami Flex — Temp Mail</h1>
+    <div class="row">
+      <div id="emailBox">براۓ مہربانی پہلا "Generate" کریں</div>
+      <button id="generateBtn">ای میل بنائیں</button>
+      <button id="copyBtn" class="secondary">کاپی کریں</button>
+      <div id="loader">⏳ لوڈ ہو رہا ہے...</div>
+    </div>
 
-  <div class="welcome">📧 Kami Flex Temp Mail 📧</div>
+    <div class="row" style="margin-top:14px">
+      <button id="refreshInbox">Inbox تازہ کریں</button>
+      <button id="clearBtn" class="secondary">خالی کریں</button>
+      <div style="flex:1"></div>
+      <div class="small muted">API پروکسی: <strong>/api/index.js</strong></div>
+    </div>
 
-  <button class="btn" id="generateBtn">Generate Temp Email</button>
-  <div id="loader">⏳ Generating email...</div>
-  <div id="emailBox">No email yet</div>
+    <h3 style="margin-top:18px">📥 Inbox</h3>
+    <ul id="inbox"><li class="muted small">براہِ کرم پہلے ای میل بنائیں یا refresh کریں</li></ul>
 
-  <div id="infoBox">⚠️ Please generate an email first</div>
-
-  <div class="section">
-    <h2>📥 Inbox</h2>
-    <ul id="inbox">
-      <li style="text-align:center;">📭 No messages</li>
-    </ul>
+    <h3 style="margin-top:18px">📨 Message</h3>
+    <div id="messageContent" class="muted small">پیغام یہاں دکھے گا</div>
   </div>
 
-  <div class="section">
-    <h2>📨 Message</h2>
-    <div id="messageContent">Select a message to read</div>
-  </div>
+<script>
+let currentEmail = "";
 
-  <script src="temp.js"></script>
+function setLoading(on){
+  document.getElementById('loader').style.display = on? 'inline-block':'none';
+}
+
+// generate email
+document.getElementById('generateBtn').addEventListener('click', async ()=>{
+  setLoading(true);
+  try{
+    const res = await fetch('/api/index?op=generate');
+    const data = await res.json();
+    if(data && data.email){
+      currentEmail = data.email;
+      document.getElementById('emailBox').innerText = '📧 ' + currentEmail;
+      await navigator.clipboard.writeText(currentEmail).catch(()=>{});
+      loadInbox();
+    } else {
+      document.getElementById('emailBox').innerText = '❌ Generate failed';
+    }
+  }catch(err){
+    document.getElementById('emailBox').innerText = '⚠️ Error: '+err.message;
+  } finally { setLoading(false); }
+});
+
+// copy
+document.getElementById('copyBtn').addEventListener('click', async ()=>{
+  if(!currentEmail) return alert('پہلے Generate کریں');
+  await navigator.clipboard.writeText(currentEmail).catch(()=>{});
+  alert("Copied: "+currentEmail);
+});
+
+// clear
+document.getElementById('clearBtn').addEventListener('click', ()=>{
+  currentEmail="";
+  document.getElementById('emailBox').innerText='براۓ مہربانی پہلا "Generate" کریں';
+  document.getElementById('inbox').innerHTML='<li class="muted small">Inbox خالی</li>';
+  document.getElementById('messageContent').innerText="پیغام یہاں دکھے گا";
+});
+
+// refresh inbox
+document.getElementById('refreshInbox').addEventListener('click', ()=> loadInbox());
+
+// load inbox
+async function loadInbox(){
+  if(!currentEmail) return;
+  const inboxEl=document.getElementById('inbox');
+  inboxEl.innerHTML='<li class="muted small">⏳ Loading...</li>';
+  try{
+    const res=await fetch('/api/index?op=inbox&email='+encodeURIComponent(currentEmail));
+    const data=await res.json();
+    if(Array.isArray(data) && data.length>0){
+      inboxEl.innerHTML="";
+      data.forEach(msg=>{
+        const li=document.createElement('li');
+        li.innerText=`From: ${msg.from} — Subject: ${msg.subject}`;
+        li.onclick=()=> loadMessage(msg.id);
+        inboxEl.appendChild(li);
+      });
+    }else{
+      inboxEl.innerHTML='<li class="muted small">📭 No messages</li>';
+    }
+  }catch(err){
+    inboxEl.innerHTML='<li class="muted small">⚠️ Error loading inbox</li>';
+  }
+}
+
+// load single message
+async function loadMessage(id){
+  const messageEl=document.getElementById('messageContent');
+  messageEl.innerText="⏳ Loading...";
+  try{
+    const res=await fetch('/api/index?op=message&email='+encodeURIComponent(currentEmail)+'&messageid='+id);
+    const data=await res.json();
+    messageEl.innerText=data.text || data.body || "⚠️ No content";
+  }catch(err){
+    messageEl.innerText="⚠️ Error loading message";
+  }
+}
+</script>
 </body>
 </html>

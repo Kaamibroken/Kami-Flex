@@ -1,28 +1,25 @@
 import fetch from "node-fetch";
 
-const API_KEY = "prince";
-const BASE = "https://api.princetechn.com/api/tempmail";
-
 export default async function handler(req, res) {
   const { op, email, messageid } = req.query;
+  const apikey = "prince"; // tumhara API key
 
   try {
+    let url = "";
     if (op === "generate") {
-      const r = await fetch(`${BASE}/generate?apikey=${API_KEY}`);
-      const d = await r.json();
-      return res.json(d);
+      url = `https://api.princetechn.com/api/tempmail/generate?apikey=${apikey}`;
+    } else if (op === "inbox" && email) {
+      url = `https://api.princetechn.com/api/tempmail/inbox?apikey=${apikey}&email=${email}`;
+    } else if (op === "message" && email && messageid) {
+      url = `https://api.princetechn.com/api/tempmail/message?apikey=${apikey}&email=${email}&messageid=${messageid}`;
+    } else {
+      return res.status(400).json({ error: "Invalid parameters" });
     }
-    if (op === "inbox" && email) {
-      const r = await fetch(`${BASE}/inbox?apikey=${API_KEY}&email=${email}`);
-      const d = await r.json();
-      return res.json(d);
-    }
-    if (op === "message" && email && messageid) {
-      const r = await fetch(`${BASE}/message?apikey=${API_KEY}&email=${email}&messageid=${messageid}`);
-      const d = await r.json();
-      return res.json(d);
-    }
-    res.status(400).json({ error: "Invalid operation" });
+
+    const r = await fetch(url);
+    const data = await r.json();
+    res.status(200).json(data);
+
   } catch (err) {
     res.status(500).json({ error: "Server error", details: err.message });
   }

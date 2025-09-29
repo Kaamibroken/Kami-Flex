@@ -1,253 +1,292 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Kami Flex Fake Number</title>
-  <style>
-    :root{--bg:#071a2a;--card:rgba(255,255,255,0.04);--muted:#9aa4b2;--accent:#06b6d4}
-    body{font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,#071024,#071a2a);color:#e6eef6;margin:0;padding:18px}
-    .wrap{max-width:1100px;margin:0 auto}
-    header{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    h1{margin:0 0 6px 0}
-    .meta{font-size:13px;color:var(--muted)}
-    .controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px}
-    input,select,button{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit}
-    button{background:var(--accent);color:#042;border:0;cursor:pointer}
-    .card{background:var(--card);padding:12px;border-radius:10px;margin-top:12px}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
-    .daily{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-    .item{padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .small{font-size:13px;color:var(--muted)}
-    .copy{padding:6px 10px;border-radius:6px;background:#173644;color:#cfe8ea;border:0;cursor:pointer}
-    .otp{font-weight:700;color:#b7ff6a;margin-left:10px}
-    .list{display:grid;gap:8px;margin-top:8px}
-    .pagination{display:flex;gap:8px;justify-content:center;margin-top:14px;align-items:center}
-    textarea#log{width:100%;height:160px;margin-top:12px;border-radius:8px;background:#02101a;color:#cfe8ea;border:0;padding:10px;resize:vertical}
-    @media(max-width:900px){.daily{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}
-    @media(max-width:560px){.daily{grid-template-columns:1fr}}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Kami Flex — Styled List (Raazit)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-1:#041427;
+    --bg-2:#071a2a;
+    --card:rgba(255,255,255,0.03);
+    --muted:#8fa3b2;
+    --accent1:#19c2ff;
+    --accent2:#1fb6ff;
+    --green:#7ef05d;
+    --glass:rgba(255,255,255,0.02);
+  }
+  html,body{height:100%;margin:0;background:radial-gradient(circle at 20% 10%, rgba(255,255,255,0.02), transparent 10%), linear-gradient(180deg,var(--bg-1),var(--bg-2));font-family:Inter,system-ui,Arial;color:#e6f3fb}
+  .wrap{max-width:980px;margin:20px auto;padding:18px}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:56px;height:36px;border-radius:10px;background:linear-gradient(90deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#022}
+  h1{margin:0;font-size:18px}
+  .controls{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 6px 18px rgba(3,8,18,0.5);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  select,input{background:transparent;border-radius:10px;padding:10px;border:1px solid rgba(255,255,255,0.04);color:inherit;min-width:160px}
+  .btn{padding:10px 18px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#012;cursor:pointer}
+  .card{background:var(--glass);margin-top:16px;border-radius:14px;padding:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.02)}
+  .list-head{display:grid;grid-template-columns:1fr 1fr 140px;gap:12px;padding:12px 6px;border-bottom:1px dashed rgba(255,255,255,0.03);align-items:center;color:var(--muted);font-size:13px}
+  .rows{display:grid;gap:10px;padding:12px 6px;max-height:480px;overflow:auto}
+  .row{display:grid;grid-template-columns:1fr 1fr 140px;gap:12px;align-items:center;padding:14px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border-radius:10px}
+  .number{font-weight:700;font-size:15px}
+  .otp{color:var(--green);font-weight:700;margin-top:6px;font-size:14px}
+  .country{display:flex;flex-direction:column}
+  .country .name{font-weight:600}
+  .country .carrier{color:var(--accent2);margin-top:6px}
+  .time{color:var(--accent2);font-weight:600;text-align:right}
+  .small-muted{color:var(--muted);font-size:13px}
+  .pagination{display:flex;gap:8px;align-items:center;justify-content:center;padding:14px;color:var(--muted)}
+  textarea#log{width:100%;height:120px;border-radius:10px;background:#02101a;color:#9fdbe8;border:0;padding:10px;resize:vertical;margin-top:12px}
+  .moon{position:fixed;left:50%;transform:translateX(-50%);bottom:220px;width:260px;height:260px;background:radial-gradient(circle at 30% 30%, #aab7c6, #1c2b37);opacity:0.08;border-radius:50%;pointer-events:none}
+  @media(max-width:860px){ .list-head, .row{grid-template-columns: 1fr 1fr 110px} .time{text-align:left}}
+  @media(max-width:560px){ .list-head, .row{grid-template-columns: 1fr; } .time{text-align:left; margin-top:8px} .country{margin-top:6px} }
+</style>
 </head>
 <body>
+  <div class="moon"></div>
   <div class="wrap">
-    <header>
-      <div>
-        <h1>Kami Flex Fake Number</h1>
-        <div class="meta">All Countries (from API) • 20 numbers per page • Top 12 daily • Copy & OTP</div>
+    <header class="top">
+      <div class="brand">
+        <div class="logo">O</div>
+        <div>
+          <h1>ACCHUB.IO — SMS MONSTER</h1>
+          <div class="small-muted">Full country name • carrier from API • OTP under number</div>
+        </div>
       </div>
-      <div style="min-width:220px">
-        <label class="small">App ID</label><br/>
-        <input id="appInput" placeholder="global--AF-93" value="global--AF-93" style="width:100%"/>
+
+      <div style="display:flex;gap:10px;align-items:center">
+        <select id="countrySelect"><option>Any country</option></select>
+        <select id="carrierSelect"><option>Any carrier</option></select>
+        <button id="getBtn" class="btn">✈ Get</button>
+        <button id="generateBtn" class="btn">＋ Generate</button>
       </div>
     </header>
 
-    <div class="controls">
-      <select id="countrySelect" style="min-width:220px"></select>
-      <input id="carrierInput" placeholder="Carrier (e.g. 619)" />
-      <button id="loadBtn">Load Page</button>
-      <button id="generateBtn">Generate</button>
-      <button id="refreshBtn">Refresh OTPs</button>
-      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <button id="prevBtn">Prev</button>
-        <div id="pageInfo" class="small" style="padding:6px 10px;background:rgba(255,255,255,0.02);border-radius:8px">Page 1</div>
-        <button id="nextBtn">Next</button>
-      </div>
-    </div>
-
     <div class="card">
-      <h3 style="margin:0 0 8px 0">Daily top 12</h3>
-      <div id="daily" class="daily"></div>
-    </div>
-
-    <div class="card">
-      <h3 style="margin:0 0 8px 0">Other numbers (rest of page)</h3>
-      <div id="list" class="list"></div>
-      <div class="pagination">
-        <span class="small">Showing 20 per page</span>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 style="margin:0">Numbers</h3>
+        <div class="small-muted" id="recordsInfo">Showing 0 records</div>
       </div>
+
+      <div class="list-head">
+        <div>Phone</div>
+        <div>Country / Carrier</div>
+        <div style="text-align:right">Time</div>
+      </div>
+
+      <div class="rows" id="rows"></div>
+
+      <div class="pagination" id="pagination">1 ‹ 2 › 6</div>
     </div>
 
     <textarea id="log" readonly placeholder="Logs & raw responses"></textarea>
   </div>
 
 <script>
-  async function api(params = {}) {
-    const url = '/api/fake?' + new URLSearchParams(params).toString();
-    const res = await fetch(url, {cache: 'no-store'});
-    return await res.text();
-  }
+  // --- CONFIG ---
+  const API_URL = 'https://raazit.acchub.io/api/sms/';
+  const AUTH_TOKEN = 'f5f67281-417e-4925-b74b-e86de2eee205'; // keep same header as your curl
 
-  let currentPage = 1;
-  const PAGE_SIZE = 20;
-  let numbersCache = [];
-
-  const countrySelect = document.getElementById('countrySelect');
-  const appInput = document.getElementById('appInput');
-  const carrierInput = document.getElementById('carrierInput');
-  const dailyEl = document.getElementById('daily');
-  const listEl = document.getElementById('list');
+  // --- STATE ---
+  const rowsEl = document.getElementById('rows');
   const logEl = document.getElementById('log');
-  const pageInfo = document.getElementById('pageInfo');
+  const countrySelect = document.getElementById('countrySelect');
+  const carrierSelect = document.getElementById('carrierSelect');
+  const recordsInfo = document.getElementById('recordsInfo');
+  let records = []; // array of items
 
-  document.getElementById('loadBtn').addEventListener('click', ()=>loadPage(1));
-  document.getElementById('generateBtn').addEventListener('click', generateNumber);
-  document.getElementById('refreshBtn').addEventListener('click', refreshOtps);
-  document.getElementById('prevBtn').addEventListener('click', ()=>{ if(currentPage>1) loadPage(currentPage-1); });
-  document.getElementById('nextBtn').addEventListener('click', ()=>loadPage(currentPage+1));
-
-  async function loadCountries(){
-    try {
-      const txt = await api({ type: 'countries' });
-      log('countries raw: ' + summarize(txt));
-      let data;
-      try { data = JSON.parse(txt); } catch(e){ data = null; }
-      countrySelect.innerHTML = '';
-      if(Array.isArray(data)){
-        data.forEach(c => {
-          const opt = document.createElement('option');
-          opt.value = c.code || c.id || c.name || JSON.stringify(c);
-          opt.textContent = c.name || c.country || (c.code || c.id) || JSON.stringify(c);
-          countrySelect.appendChild(opt);
-        });
-      } else if(data && Array.isArray(data.data)) {
-        data.data.forEach(c => {
-          const opt = document.createElement('option');
-          opt.value = c.code || c.id || c.name || JSON.stringify(c);
-          opt.textContent = c.name || c.country || (c.code || c.id);
-          countrySelect.appendChild(opt);
-        });
-      } else {
-        const names = Array.from(new Set((txt.match(/[A-Z][a-z]{2,20}(?: [A-Z][a-z]{2,20})?/g) || []).slice(0,80)));
-        names.forEach(n => {
-          const opt = document.createElement('option');
-          opt.value = n; opt.textContent = n; countrySelect.appendChild(opt);
-        });
-      }
-      if(countrySelect.options.length === 0){
-        const opt = document.createElement('option'); opt.value='all'; opt.textContent='All Countries (no data)'; countrySelect.appendChild(opt);
-      }
-    } catch(err){
-      log('Countries fetch failed: ' + err.message);
-      countrySelect.innerHTML = '<option>All Countries (error)</option>';
-    }
-  }
-
-  async function loadPage(page = 1){
-    currentPage = page;
-    pageInfo.textContent = 'Loading...';
-    numbersCache = [];
-    dailyEl.innerHTML = '';
-    listEl.innerHTML = '';
-    log('Requesting ' + PAGE_SIZE + ' numbers (page ' + page + ')');
-    const app = appInput.value || undefined;
-    const carrier = carrierInput.value || undefined;
-
-    const calls = Array.from({length: PAGE_SIZE}, ()=>api({ type: 'number', app, carrier }));
-    const results = await Promise.allSettled(calls);
-
-    for(let i=0;i<results.length;i++){
-      const r = results[i];
-      const item = { number: '', id: '', raw: '', otp: null };
-      if(r.status === 'fulfilled'){
-        item.raw = r.value;
-        try {
-          const j = JSON.parse(r.value);
-          item.id = j.data?.id || j.id || j.request_id || j.orderId || '';
-          item.number = j.data?.number || j.number || j.phone || j.msisdn || '';
-        } catch(e){
-          const m = r.value.match(/(\+\d[\d\-\s]{5,}\d)|(\d{6,15})/);
-          item.number = m ? (m[0].replace(/\s+/g,'').replace(/-/g,'')) : '';
-          const m2 = r.value.match(/\b[0-9]{4,12}\b/);
-          item.id = m2 ? m2[0] : '';
-        }
-      } else {
-        item.raw = 'ERROR: ' + (r.reason && r.reason.message ? r.reason.message : String(r.reason));
-      }
-      numbersCache.push(item);
-    }
-
-    pageInfo.textContent = 'Page ' + currentPage;
-    renderNumbers();
-    await refreshOtps();
-  }
-
-  function renderNumbers(){
-    dailyEl.innerHTML = '';
-    listEl.innerHTML = '';
-    numbersCache.forEach((n, idx)=>{
-      const node = buildRow(n, idx);
-      if(idx < 12) dailyEl.appendChild(node);
-      else listEl.appendChild(node);
-    });
-  }
-
-  function buildRow(item, idx){
-    const el = document.createElement('div'); el.className = 'item';
-    const left = document.createElement('div');
-    left.innerHTML = `<div style="font-weight:700">${escapeHtml(item.number || '(no number)')}</div>
-                      <div class="small">id: ${escapeHtml(item.id || '-')}</div>`;
-    const right = document.createElement('div');
-    const copyBtn = document.createElement('button'); copyBtn.className='copy'; copyBtn.textContent='Copy';
-    copyBtn.onclick = async ()=>{ try{ await navigator.clipboard.writeText(item.number||''); copyBtn.textContent='Copied'; setTimeout(()=>copyBtn.textContent='Copy',1200); }catch(e){ copyBtn.textContent='Err'; setTimeout(()=>copyBtn.textContent='Copy',1200);} };
-    const otpSpan = document.createElement('span'); otpSpan.className='otp'; otpSpan.textContent = item.otp ? item.otp : '';
-    right.appendChild(copyBtn); right.appendChild(otpSpan);
-    el.appendChild(left); el.appendChild(right);
-    return el;
-  }
-
-  async function refreshOtps(){
-    log('Refreshing OTPs...');
-    try {
-      const txt = await api({ type: 'otp' });
-      log('OTP raw: ' + summarize(txt));
-      const matches = (txt.match(/\b[0-9]{4,8}\b/g) || []).slice(0,200);
-      for(const m of matches){
-        let attached = false;
-        for(const it of numbersCache){
-          if(it.raw && it.raw.includes(m) && !it.otp){ it.otp = m; attached = true; break; }
-        }
-        if(!attached){
-          for(const it of numbersCache){
-            if(!it.otp){ it.otp = m; attached = true; break; }
-          }
-        }
-      }
-      renderNumbers();
-    } catch(err){ log('OTP fetch error: ' + err.message); }
-  }
-
-  async function generateNumber(){
-    const app = appInput.value || undefined;
-    const carrier = carrierInput.value || undefined;
-    log('Generating 1 number...');
-    try {
-      const txt = await api({ type: 'number', app, carrier });
-      let item = { number: '', id: '', raw: txt, otp: null };
-      try {
-        const j = JSON.parse(txt);
-        item.id = j.data?.id || j.id || j.request_id || j.orderId || '';
-        item.number = j.data?.number || j.number || j.phone || j.msisdn || '';
-      } catch(e){
-        const m = txt.match(/(\+\d[\d\-\s]{5,}\d)|(\d{6,15})/);
-        item.number = m ? (m[0].replace(/\s+/g,'').replace(/-/g,'')) : '';
-        const m2 = txt.match(/\b[0-9]{4,12}\b/);
-        item.id = m2 ? m2[0] : '';
-      }
-
-      numbersCache.push(item); // Add to Other numbers (below top 12)
-      renderNumbers();
-      await refreshOtps();
-    } catch(err){ log('Generate error: ' + err.message); }
-  }
-
+  // --- Helpers ---
   function log(msg){
     const ts = new Date().toLocaleString();
     logEl.value = `[${ts}] ${msg}\n\n` + logEl.value;
   }
   function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-  function summarize(txt, n=300){ return txt? (txt.length>n? txt.slice(0,n)+'...': txt) : '(empty)'; }
+  function timeAgo(isoOrTs){
+    try {
+      const d = new Date(isoOrTs);
+      const now = Date.now();
+      const s = Math.floor((now - d.getTime())/1000);
+      if(isNaN(s)) return String(isoOrTs);
+      if(s < 60) return `${s}s ago`;
+      if(s < 3600) return `${Math.floor(s/60)}m ago`;
+      if(s < 86400) return `${Math.floor(s/3600)}h ago`;
+      return `${Math.floor(s/86400)}d ago`;
+    } catch(e){ return String(isoOrTs); }
+  }
 
-  loadCountries().then(()=> loadPage(1));
+  // parse response in defensive way
+  function parseApiResponse(raw){
+    // raw may already be object
+    const data = (typeof raw === 'string') ? (()=>{ try{return JSON.parse(raw)}catch(e){return null}})() : raw;
+    // common keys mapping
+    const number = data?.number || data?.phone || data?.msisdn || data?.tel || data?.data?.number || '';
+    const id = data?.id || data?.request_id || data?.data?.id || data?.orderId || '';
+    const country = data?.country || data?.data?.country || data?.country_name || data?.location || '';
+    const carrier = data?.carrier || data?.provider || data?.data?.carrier || data?.source || 'global';
+    const otp = data?.otp || data?.code || data?.message?.match?.(/\b[0-9]{4,8}\b/) || null;
+    const created = data?.created_at || data?.timestamp || data?.time || new Date().toISOString();
+    return { number, id, country, carrier, otp, created, raw: JSON.stringify(data) };
+  }
+
+  // render rows
+  function render(){
+    rowsEl.innerHTML = '';
+    records.forEach(item=>{
+      const r = document.createElement('div'); r.className = 'row';
+      const left = document.createElement('div');
+      left.innerHTML = `<div class="number">${escapeHtml(item.number || '(no number)')}</div>
+                        <div class="otp">${item.otp ? escapeHtml(item.otp) : ''}</div>`;
+      const mid = document.createElement('div');
+      mid.innerHTML = `<div class="country"><div class="name">${escapeHtml(item.country || 'Unknown')}</div>
+                       <div class="carrier">${escapeHtml(item.carrier || 'global')}</div></div>`;
+      const right = document.createElement('div'); right.className='time';
+      right.innerHTML = `<div>${escapeHtml(timeAgo(item.created))}</div>`;
+      r.appendChild(left); r.appendChild(mid); r.appendChild(right);
+      rowsEl.appendChild(r);
+    });
+    recordsInfo.textContent = `Showing ${records.length} records`;
+  }
+
+  // POST to API (FormData) similar to curl
+  async function postSms(app, carrier){
+    const fd = new FormData();
+    fd.append('app', app);
+    fd.append('carrier', carrier);
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'auth-token': AUTH_TOKEN,
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: fd,
+        credentials: 'include'
+      });
+      const txt = await res.text();
+      log('POST raw: ' + (txt.slice(0,300)) );
+      try { return JSON.parse(txt); } catch(e){ return txt; }
+    } catch(err){
+      log('Fetch error: ' + err.message);
+      throw err;
+    }
+  }
+
+  // --- Populate selects with some common countries (full names) ---
+  const COUNTRIES = [
+    {code:'AF', name:'Afghanistan'},
+    {code:'PK', name:'Pakistan'},
+    {code:'IN', name:'India'},
+    {code:'US', name:'United States'},
+    {code:'GB', name:'United Kingdom'},
+    {code:'CA', name:'Canada'},
+    {code:'AU', name:'Australia'},
+    {code:'DE', name:'Germany'},
+    {code:'FR', name:'France'}
+  ];
+  const SAMPLE_CARRIERS = ['global','619','101','viva','mtc','vodafone','att','t-mobile'];
+
+  function initSelects(){
+    countrySelect.innerHTML = '<option value="">Any country</option>';
+    COUNTRIES.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.code;
+      opt.textContent = c.name;
+      countrySelect.appendChild(opt);
+    });
+    carrierSelect.innerHTML = '<option value="">Any carrier</option>';
+    SAMPLE_CARRIERS.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c;
+      opt.textContent = c;
+      carrierSelect.appendChild(opt);
+    });
+  }
+
+  // Build app id from country code (like global--AF-93) but flexible
+  function buildAppId(countryCode){
+    if(!countryCode) return `global--AF-${Math.floor(10+Math.random()*90)}`;
+    return `global--${countryCode}-${Math.floor(10+Math.random()*90)}`;
+  }
+
+  // GET button: fetch many numbers (e.g., 20) using selected filters
+  async function getNumbersBatch(count=12){
+    const selectedCountry = countrySelect.value;
+    const selectedCarrier = carrierSelect.value;
+    log(`Get batch: country=${selectedCountry||'any'} carrier=${selectedCarrier||'any'} count=${count}`);
+    const batch = [];
+    for(let i=0;i<count;i++){
+      const app = buildAppId(selectedCountry);
+      const carrier = selectedCarrier || SAMPLE_CARRIERS[Math.floor(Math.random()*SAMPLE_CARRIERS.length)];
+      try {
+        const raw = await postSms(app, carrier);
+        const parsed = parseApiResponse(raw);
+        // ensure country full name if we have code
+        if(!parsed.country && selectedCountry){
+          const found = COUNTRIES.find(c=>c.code===selectedCountry);
+          if(found) parsed.country = found.name;
+        }
+        batch.push(parsed);
+        // small delay to avoid hammering (optional)
+        await new Promise(res=>setTimeout(res, 150));
+      } catch(e){
+        // push fallback item
+        batch.push({number:'(error)',id:'err',country:'-',carrier:carrier,otp:null,created:new Date().toISOString(),raw:'error'});
+      }
+    }
+    // Append daily top if empty, else append to end
+    records = records.concat(batch);
+    render();
+  }
+
+  // Generate: one random number (append to list)
+  async function generateOne(){
+    const countryCode = countrySelect.value || COUNTRIES[Math.floor(Math.random()*COUNTRIES.length)].code;
+    const carrier = carrierSelect.value || SAMPLE_CARRIERS[Math.floor(Math.random()*SAMPLE_CARRIERS.length)];
+    const app = buildAppId(countryCode);
+    log(`Generate one → app=${app} carrier=${carrier}`);
+    try {
+      const raw = await postSms(app, carrier);
+      const parsed = parseApiResponse(raw);
+      // fill full country name if possible
+      const found = COUNTRIES.find(c=>c.code===countryCode);
+      if(!parsed.country && found) parsed.country = found.name;
+      records.push(parsed);
+      render();
+    } catch(err){
+      log('Generate failed: ' + err.message);
+    }
+  }
+
+  // init
+  initSelects();
+  // load initial daily top 12
+  (async ()=>{ await getNumbersBatch(12); })();
+
+  // event listeners
+  document.getElementById('getBtn').addEventListener('click', ()=>getNumbersBatch(12));
+  document.getElementById('generateBtn').addEventListener('click', generateOne);
+
+  // Auto-refresh OTPs for existing records (optional): tries to re-check raw responses for new OTPs
+  async function refreshOtps(){
+    // naive: call API OTP endpoint if exists OR re-post to see updated messages
+    // Here we attempt to POST to the same API with each record's app/carrier to refresh (light)
+    for(let i=0;i<records.length;i++){
+      // skip if already has otp
+      if(records[i].otp) continue;
+      // attempt small retry by posting once (use same carrier)
+      const countryCode = COUNTRIES.find(c=>c.name===records[i].country)?.code || '';
+      try{
+        const raw = await postSms(buildAppId(countryCode), records[i].carrier || SAMPLE_CARRIERS[0]);
+        const parsed = parseApiResponse(raw);
+        if(parsed.otp) { records[i].otp = parsed.otp; records[i].raw = parsed.raw; }
+      }catch(e){}
+      await new Promise(res=>setTimeout(res,200));
+    }
+    render();
+  }
+  // optional periodic refresh (commented by default)
+  // setInterval(refreshOtps, 15000);
 </script>
 </body>
 </html>

@@ -2,31 +2,62 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kami Flex Fake Number</title>
+  <title>Temp Mail by Kami Flex</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    async function generateEmail() {
+      const res = await fetch("/api/tempmail?op=generate");
+      const data = await res.json();
+      document.getElementById("generatedEmail").innerText = data.email || JSON.stringify(data);
+      document.getElementById("emailInput").value = data.email || "";
+    }
+
+    async function getInbox() {
+      const email = document.getElementById("emailInput").value;
+      if (!email) return alert("⚠️ Please enter email first");
+      const res = await fetch(`/api/tempmail?op=inbox&email=${email}`);
+      const data = await res.json();
+      document.getElementById("inbox").innerText = JSON.stringify(data, null, 2);
+    }
+
+    async function getMessage() {
+      const email = document.getElementById("emailInput").value;
+      const messageid = document.getElementById("messageIdInput").value;
+      if (!email || !messageid) return alert("⚠️ Please enter both email and message ID");
+      const res = await fetch(`/api/tempmail?op=message&email=${email}&messageid=${messageid}`);
+      const data = await res.json();
+      document.getElementById("message").innerText = JSON.stringify(data, null, 2);
+    }
+  </script>
 </head>
-<body class="bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 min-h-screen flex flex-col items-center justify-center text-white font-sans">
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-6">
+  <h1 class="text-3xl font-bold text-indigo-400 mb-6">📧 Temp Mail by Kami Flex</h1>
 
-  <div class="bg-white/10 backdrop-blur-md rounded-2xl shadow-xl p-8 w-11/12 max-w-2xl text-center">
-    <h1 class="text-3xl font-bold mb-6">📱 Kami Flex Fake Number Service</h1>
-    
-    <div class="grid grid-cols-2 gap-4 mb-6">
-      <button onclick="getOtp()" class="bg-purple-700 hover:bg-purple-800 p-3 rounded-xl shadow-md">🔑 Get OTP</button>
-      <button onclick="getNumber()" class="bg-blue-600 hover:bg-blue-700 p-3 rounded-xl shadow-md">📞 Get Number</button>
-      <button onclick="getCountries()" class="bg-green-600 hover:bg-green-700 p-3 rounded-xl shadow-md">🌍 Get Countries</button>
-      <button onclick="getCarriers()" class="bg-orange-600 hover:bg-orange-700 p-3 rounded-xl shadow-md">📡 Get Carriers</button>
-    </div>
-
-    <div class="bg-black/60 p-4 rounded-xl text-left overflow-auto max-h-80">
-      <pre id="output" class="text-sm whitespace-pre-wrap"></pre>
-    </div>
+  <div class="bg-gray-800 p-6 rounded-2xl shadow-lg w-full max-w-lg mb-6">
+    <button onclick="generateEmail()" class="bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-lg text-white font-semibold">
+      Generate Temp Email
+    </button>
+    <p class="mt-4"><b>Generated Email:</b> <span id="generatedEmail" class="text-green-400">---</span></p>
   </div>
 
-  <footer class="mt-6 text-sm opacity-80">
-    ⚡ Powered by Kami Flex
-  </footer>
+  <div class="bg-gray-800 p-6 rounded-2xl shadow-lg w-full max-w-lg mb-6">
+    <h2 class="text-xl font-semibold text-yellow-400 mb-2">Check Inbox</h2>
+    <input type="text" id="emailInput" placeholder="Enter your temp email"
+           class="w-full px-3 py-2 rounded-lg text-black mb-3">
+    <button onclick="getInbox()" class="bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded-lg text-white font-semibold">
+      Get Inbox
+    </button>
+    <pre id="inbox" class="bg-black text-green-300 p-3 mt-4 rounded-lg overflow-x-auto text-sm"></pre>
+  </div>
 
-  <script src="script.js"></script>
+  <div class="bg-gray-800 p-6 rounded-2xl shadow-lg w-full max-w-lg">
+    <h2 class="text-xl font-semibold text-pink-400 mb-2">Read Message</h2>
+    <input type="text" id="messageIdInput" placeholder="Enter Message ID"
+           class="w-full px-3 py-2 rounded-lg text-black mb-3">
+    <button onclick="getMessage()" class="bg-pink-500 hover:bg-pink-600 px-4 py-2 rounded-lg text-white font-semibold">
+      Get Message
+    </button>
+    <pre id="message" class="bg-black text-blue-300 p-3 mt-4 rounded-lg overflow-x-auto text-sm"></pre>
+  </div>
 </body>
 </html>

@@ -1,392 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Temp Mail — Kami Flex</title>
-
-  <!-- Monetag -->
-  <meta name="monetag" content="b805f1bd7c6023d0341a4d15bd8fe547">
-
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <style>
-    /* small custom styles */
-    .glass {
-      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.06);
-    }
-    .neon-text {
-      background: linear-gradient(90deg, #ff7ad1, #7c5cff, #42d9ff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-    /* large centered loader */
-    .center-loader {
-      position: fixed;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      z-index: 60;
-      background: rgba(2,6,23,0.55);
-    }
-    .pulse {
-      animation: pulse 1.6s infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    @keyframes pulse {
-      0% { transform: scale(1) }
-      50% { transform: scale(1.02) }
-      100% { transform: scale(1) }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Temp Mail — Kami Flex</title>
+<meta name="monetag" content="b805f1bd7c6023d0341a4d15bd8fe547">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .glass { background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); backdrop-filter: blur(10px); border:1px solid rgba(255,255,255,0.06); }
+  .neon-text { background: linear-gradient(90deg, #ff7ad1, #7c5cff, #42d9ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .center-loader { position: fixed; inset:0; display:grid; place-items:center; z-index:60; background: rgba(2,6,23,0.55);}
+  @keyframes spin {0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+  /* Modal */
+  .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:70; align-items:center; justify-content:center; }
+  .modal-content { background:#0f0f1a; padding:2rem; border-radius:12px; max-width:90%; max-height:80%; overflow:auto; color:#f8f8f2; font-family:monospace; box-shadow:0 0 25px rgba(0,0,0,0.7); position:relative;}
+  .modal-close { position:absolute; top:1rem; right:1rem; cursor:pointer; background:#ff5555; color:#fff; border:none; border-radius:8px; padding:0.3rem 0.8rem; font-weight:bold; }
+  .modal-header { font-size:1.5rem; color:#ff79c6; margin-bottom:1rem; }
+  .modal-meta { color:#8be9fd; margin-bottom:1rem; }
+  .modal-copy { background:#50fa7b; color:#000; border:none; padding:0.5rem 1rem; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom:1rem; transition:0.1s; }
+  .modal-copy:hover { transform:scale(1.05); }
+  pre { background:#282a36; border-radius:10px; padding:1rem; overflow-x:auto; white-space:pre-wrap; word-wrap:break-word; }
+</style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-black text-white antialiased">
 
-  <!-- Back Button -->
-  <div class="p-4">
-    <button onclick="location.href='index.html'" class="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600">⬅</button>
-  </div>
+<!-- Back Button -->
+<div class="p-4">
+  <button onclick="location.href='index.html'" class="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600">⬅ Back</button>
+</div>
 
-  <!-- Center fullpage loader (hidden by default) -->
-  <div id="fullLoader" class="center-loader hidden">
-    <div class="flex flex-col items-center gap-4">
-      <div style="border:4px solid rgba(255,255,255,0.12); border-top:4px solid #a855f7; border-radius:9999px; width:72px; height:72px; animation:spin 1s linear infinite;"></div>
-      <div class="text-white/80">Loading…</div>
+<!-- Loader -->
+<div id="fullLoader" class="center-loader hidden">
+  <div class="flex flex-col items-center gap-4">
+    <div style="border:6px solid rgba(255,255,255,0.12); border-top:6px solid #a855f7; border-radius:9999px; width:80px; height:80px; animation:spin 1s linear infinite;"></div>
+    <div class="text-white/80">Loading…</div>
+  </div>
+</div>
+
+<div class="max-w-6xl mx-auto p-6">
+  <!-- Header -->
+  <header class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+    <div class="flex items-center gap-4">
+      <div class="w-14 h-14 rounded-xl flex items-center justify-center bg-gradient-to-tr from-pink-500 to-indigo-500 shadow-lg">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <path d="M3 8.5L12 3l9 5.5V17a2 2 0 0 1-2 2h-3v-5H8v5H5a2 2 0 0 1-2-2V8.5z" fill="white" />
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-2xl md:text-3xl font-extrabold neon-text">Temp Mail <span class="text-white/70 font-semibold">by Kami Flex</span></h1>
+        <p class="text-sm text-white/60 mt-1">Disposable temp-mail — generate, check inbox and read messages (10 minute expiry)</p>
+      </div>
     </div>
-  </div>
+    <div class="flex items-center gap-3">
+      <button id="generateBtn" class="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 shadow-lg hover:scale-105 transition-transform">🎲 Generate Email</button>
+      <button id="copyBtn" class="px-4 py-2 rounded-xl bg-green-500 text-black font-semibold hidden">📋 Copy</button>
+    </div>
+  </header>
 
-  <!-- Page container -->
-  <div class="max-w-6xl mx-auto p-6">
-
-    <!-- Header / Hero -->
-    <header class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-      <div class="flex items-center gap-4">
-        <div class="w-14 h-14 rounded-xl flex items-center justify-center bg-gradient-to-tr from-pink-500 to-indigo-500 shadow-lg">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="text-white">
-            <path d="M3 8.5L12 3l9 5.5V17a2 2 0 0 1-2 2h-3v-5H8v5H5a2 2 0 0 1-2-2V8.5z" fill="white" />
-          </svg>
-        </div>
-        <div>
-          <h1 class="text-2xl md:text-3xl font-extrabold neon-text">⚡ Temp Mail <span class="text-white/70 font-semibold">by Kami Flex ⚡</span></h1>
-          <p class="text-sm text-white/60 mt-1">Disposable temp-mail — generate, check inbox and read messages (10 minute expiry)</p>
-        </div>
+  <!-- Main Grid -->
+  <main class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Email & Actions -->
+    <section class="md:col-span-1 glass p-6 rounded-2xl shadow-xl">
+      <h2 class="text-lg font-semibold text-indigo-300 mb-3">Your Temp Email</h2>
+      <input id="generatedEmail" readonly class="flex-1 px-3 py-2 rounded-lg bg-slate-900/60 border border-white/5 text-sm md:text-base break-all" value="—" />
+      <p id="emailMsg" class="text-sm text-white/60 mt-3">Email auto-expires after 10 minutes.</p>
+      <div class="mt-5 space-y-3">
+        <button id="refreshInboxBtn" class="w-full px-4 py-2 rounded-lg bg-yellow-500 text-black font-semibold">📥 Refresh Inbox</button>
+        <button id="clearBtn" class="w-full px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600">🧹 Clear</button>
       </div>
+      <div class="mt-5 text-xs text-white/50">Status: <span id="statusText">Idle</span></div>
+    </section>
 
-      <div class="flex items-center gap-3">
-        <button id="generateBtn" class="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 shadow-lg hover:scale-105 transition-transform">
-          🎲 Generate Email
-        </button>
-        <button id="copyBtn" class="px-4 py-2 rounded-xl bg-green-500 text-black font-semibold hidden">📋 Copy</button>
+    <!-- Inbox -->
+    <section class="md:col-span-1 glass p-6 rounded-2xl shadow-xl overflow-hidden">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-yellow-300">Inbox</h2>
+        <span id="inboxCount" class="text-sm text-white/60">0</span>
       </div>
-    </header>
+      <div id="inboxList" class="space-y-3 overflow-auto max-h-[60vh] pr-2">
+        <div class="text-sm text-white/50">No inbox yet. Generate an email to start.</div>
+      </div>
+    </section>
 
-    <!-- Main grid -->
-    <main class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-      <!-- Left: Email card & inbox actions -->
-      <section class="md:col-span-1 glass p-6 rounded-2xl shadow-xl">
-        <h2 class="text-lg font-semibold text-indigo-300 mb-3">Your Temp Email</h2>
-
-        <div class="flex items-center gap-3">
-          <input id="generatedEmail" readonly class="flex-1 px-3 py-2 rounded-lg bg-slate-900/60 border border-white/5 text-sm md:text-base break-all" value="—" />
-        </div>
-
-        <p id="emailMsg" class="text-sm text-white/60 mt-3">Email auto-expires after 10 minutes.</p>
-
-        <div class="mt-5 space-y-3">
-          <button id="refreshInboxBtn" class="w-full px-4 py-2 rounded-lg bg-yellow-500 text-black font-semibold">📥 Refresh Inbox</button>
-          <button id="clearBtn" class="w-full px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600">🧹 Clear</button>
-        </div>
-
-        <div class="mt-5 text-xs text-white/50">
-          <div>Status: <span id="statusText">Idle</span></div>
-        </div>
-      </section>
-
-      <!-- Middle: Inbox list -->
-      <section class="md:col-span-1 glass p-6 rounded-2xl shadow-xl overflow-hidden">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-semibold text-yellow-300">Inbox</h2>
-          <span id="inboxCount" class="text-sm text-white/60">0</span>
-        </div>
-
-        <div id="inboxList" class="space-y-3 overflow-auto max-h-[60vh] pr-2">
-          <div class="text-sm text-white/50">No inbox yet. Generate an email to start.</div>
-        </div>
-      </section>
-
-      <!-- Right: Message view -->
-      <section class="md:col-span-1 glass p-6 rounded-2xl shadow-xl">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-semibold text-pink-300">Message</h2>
-          <div class="text-xs text-white/50">Preview</div>
-        </div>
-
-        <div id="messageCard" class="bg-slate-900/60 p-4 rounded-lg min-h-[180px] overflow-auto">
-          <div id="noMessage" class="text-sm text-white/50">No message selected.</div>
-          <div id="messageContent" class="hidden">
-            <div class="mb-2">
-              <div class="text-xs text-white/40">From</div>
-              <div id="msgFrom" class="font-semibold"></div>
-            </div>
-            <div class="mb-2">
-              <div class="text-xs text-white/40">Subject</div>
-              <div id="msgSubject" class="font-semibold"></div>
-            </div>
-            <hr class="my-3 border-white/5" />
-            <div id="msgBody" class="prose prose-invert text-sm"></div>
+    <!-- Message Preview -->
+    <section class="md:col-span-1 glass p-6 rounded-2xl shadow-xl">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-pink-300">Message</h2>
+        <div class="text-xs text-white/50">Preview</div>
+      </div>
+      <div id="messageCard" class="bg-slate-900/60 p-4 rounded-lg min-h-[180px] overflow-auto">
+        <div id="noMessage" class="text-sm text-white/50">No message selected.</div>
+        <div id="messageContent" class="hidden">
+          <div class="mb-2">
+            <div class="text-xs text-white/40">From</div>
+            <div id="msgFrom" class="font-semibold"></div>
           </div>
+          <div class="mb-2">
+            <div class="text-xs text-white/40">Subject</div>
+            <div id="msgSubject" class="font-semibold"></div>
+          </div>
+          <hr class="my-3 border-white/5" />
+          <div id="msgBody" class="prose prose-invert text-sm"></div>
         </div>
+      </div>
+      <div class="mt-4 flex gap-2">
+        <button id="openRawBtn" class="flex-1 px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500">Open Raw</button>
+        <button id="downloadBtn" class="px-3 py-2 rounded-lg bg-green-600 hover:bg-green-500">Download</button>
+      </div>
+    </section>
+  </main>
+</div>
 
-        <div class="mt-4 flex gap-2">
-          <button id="openRawBtn" class="flex-1 px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500">Open Raw</button>
-          <button id="downloadBtn" class="px-3 py-2 rounded-lg bg-green-600 hover:bg-green-500">Download</button>
-        </div>
-      </section>
-
-    </main>
-
-    <!-- Footer small -->
-    <footer class="mt-8 text-center text-sm text-white/50">
-      ⚡ Powered by <span class="text-indigo-300 font-semibold">Kami Flex</span> ⚡
-    </footer>
+<!-- Modal -->
+<div id="rawModal" class="modal-bg flex">
+  <div class="modal-content">
+    <button id="modalClose" class="modal-close">✖ Close</button>
+    <div class="modal-header" id="modalSubject">Subject</div>
+    <div class="modal-meta" id="modalFrom">From</div>
+    <button id="modalCopy" class="modal-copy">📋 Copy</button>
+    <pre id="modalBody">Message body</pre>
   </div>
+</div>
 
-  <!-- Toast -->
-  <div id="toast" class="fixed right-6 bottom-6 hidden bg-black/80 text-white px-4 py-2 rounded-lg shadow-lg z-50"></div>
+<div id="toast" class="fixed right-6 bottom-6 hidden bg-black/80 text-white px-4 py-2 rounded-lg shadow-lg z-50"></div>
+<script src="https://fpyf8.com/88/tag.min.js" data-zone="174168" async data-cfasync="false"></script>
+<script>
+  // JS code same as previous, only Open Raw now uses modal
+  const generateBtn=document.getElementById('generateBtn');
+  const copyBtn=document.getElementById('copyBtn');
+  const refreshInboxBtn=document.getElementById('refreshInboxBtn');
+  const clearBtn=document.getElementById('clearBtn');
+  const generatedEmail=document.getElementById('generatedEmail');
+  const statusText=document.getElementById('statusText');
+  const inboxList=document.getElementById('inboxList');
+  const inboxCount=document.getElementById('inboxCount');
+  const messageContent=document.getElementById('messageContent');
+  const noMessage=document.getElementById('noMessage');
+  const msgFrom=document.getElementById('msgFrom');
+  const msgSubject=document.getElementById('msgSubject');
+  const msgBody=document.getElementById('msgBody');
+  const messageCard=document.getElementById('messageCard');
+  const openRawBtn=document.getElementById('openRawBtn');
+  const downloadBtn=document.getElementById('downloadBtn');
+  const fullLoader=document.getElementById('fullLoader');
+  const toast=document.getElementById('toast');
 
-  <!-- Inline script -->
-  <script>
-    const generateBtn = document.getElementById('generateBtn');
-    const copyBtn = document.getElementById('copyBtn');
-    const refreshInboxBtn = document.getElementById('refreshInboxBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const generatedEmail = document.getElementById('generatedEmail');
-    const statusText = document.getElementById('statusText');
-    const inboxList = document.getElementById('inboxList');
-    const inboxCount = document.getElementById('inboxCount');
-    const messageContent = document.getElementById('messageContent');
-    const noMessage = document.getElementById('noMessage');
-    const msgFrom = document.getElementById('msgFrom');
-    const msgSubject = document.getElementById('msgSubject');
-    const msgBody = document.getElementById('msgBody');
-    const messageCard = document.getElementById('messageCard');
-    const openRawBtn = document.getElementById('openRawBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const fullLoader = document.getElementById('fullLoader');
-    const toast = document.getElementById('toast');
+  const rawModal=document.getElementById('rawModal');
+  const modalClose=document.getElementById('modalClose');
+  const modalSubject=document.getElementById('modalSubject');
+  const modalFrom=document.getElementById('modalFrom');
+  const modalBody=document.getElementById('modalBody');
+  const modalCopy=document.getElementById('modalCopy');
 
-    let currentEmail = '';
-    let currentInbox = [];
-    let currentMessage = null;
+  let currentEmail=''; let currentInbox=[]; let currentMessage=null;
 
-    function showToast(text, time = 2000) {
-      toast.innerText = text;
-      toast.classList.remove('hidden');
-      setTimeout(() => toast.classList.add('hidden'), time);
-    }
+  function showToast(text,time=2000){toast.innerText=text;toast.classList.remove('hidden');setTimeout(()=>toast.classList.add('hidden'),time);}
+  function setStatus(txt){statusText.innerText=txt;}
+  function showFullLoader(show=true){fullLoader.classList.toggle('hidden',!show);}
+  function escapeHtml(text){if(!text&&text!==0)return'';return String(text).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');}
+  function looksLikeHtml(s){return s&&typeof s==='string'&&/<\/?[a-z][\s\S]*>/i.test(s);}
 
-    function setStatus(txt) { statusText.innerText = txt; }
-    function showFullLoader(show = true) { fullLoader.classList.toggle('hidden', !show); }
+  async function safeFetch(url, opts={}, timeout=15000){const controller=new AbortController();const id=setTimeout(()=>controller.abort(),timeout);try{const res=await fetch(url,{signal:controller.signal,...opts});clearTimeout(id);if(!res.ok)throw new Error('Network response not OK: '+res.status);return await res.json();}catch(err){clearTimeout(id);throw err;}}
 
-    async function safeFetch(url, opts = {}, timeout = 15000) {
-      const controller = new AbortController();
-      const id = setTimeout(() => controller.abort(), timeout);
-      try {
-        const res = await fetch(url, { signal: controller.signal, ...opts });
-        clearTimeout(id);
-        if (!res.ok) throw new Error('Network response not OK: ' + res.status);
-        return await res.json();
-      } catch (err) {
-        clearTimeout(id);
-        throw err;
-      }
-    }
+  async function generateEmail(){showFullLoader(true); setStatus('Generating…'); try{const data=await safeFetch('/api/tempmail?op=generate'); const email=data?.result?.email||data?.email||''; if(!email){setStatus('❌ No email returned'); showFullLoader(false); return showToast('Generate failed — API returned unexpected data',3000);} 
+currentEmail=email; generatedEmail.value=email; copyBtn.classList.remove('hidden'); setStatus('✅ Email generated'); showToast('Email generated: '+email,2000); await loadInbox();
+} catch(err){console.error(err); setStatus('❌ Generate Error'); showToast('API error: '+(err.message||err),4000);} 
+finally{showFullLoader(false);} }
 
-    async function generateEmail() {
-      showFullLoader(true);
-      setStatus('Generating…');
-      try {
-        const data = await safeFetch('/api/tempmail?op=generate');
-        const email = data?.result?.email || data?.email || '';
-        if (!email) {
-          setStatus('❌ No email returned');
-          showFullLoader(false);
-          return showToast('Generate failed — API returned unexpected data', 3000);
-        }
-        currentEmail = email;
-        generatedEmail.value = email;
-        copyBtn.classList.remove('hidden');
-        setStatus('✅ Email generated');
-        showToast('Email generated: ' + email, 2000);
-        await loadInbox();
-      } catch (err) {
-        console.error(err);
-        setStatus('❌ Generate Error');
-        showToast('API error: ' + (err.message || err), 4000);
-      } finally { showFullLoader(false); }
-    }
+function copyEmail(){if(!currentEmail) return showToast('No email to copy'); navigator.clipboard.writeText(currentEmail).then(()=>{showToast('Copied to clipboard'); copyBtn.innerText='✅ Copied'; setTimeout(()=>copyBtn.innerText='📋 Copy',1500);}).catch(()=>showToast('Copy failed'));}
 
-    function copyEmail() {
-      if (!currentEmail) return showToast('No email to copy');
-      navigator.clipboard.writeText(currentEmail).then(() => {
-        showToast('Copied to clipboard');
-        copyBtn.innerText = '✅ Copied';
-        setTimeout(() => copyBtn.innerText = '📋 Copy', 1500);
-      }).catch(() => showToast('Copy failed'));
-    }
+function clearAll(){currentEmail=''; currentInbox=[]; currentMessage=null; generatedEmail.value='—'; inboxList.innerHTML='<div class="text-sm text-white/50">No inbox yet. Generate an email to start.</div>'; inboxCount.innerText=0; noMessage.classList.remove('hidden'); messageContent.classList.add('hidden'); copyBtn.classList.add('hidden'); setStatus('Cleared');}
 
-    function clearAll() {
-      currentEmail = '';
-      currentInbox = [];
-      currentMessage = null;
-      generatedEmail.value = '—';
-      inboxList.innerHTML = '<div class="text-sm text-white/50">No inbox yet. Generate an email to start.</div>';
-      inboxCount.innerText = 0;
-      noMessage.classList.remove('hidden');
-      messageContent.classList.add('hidden');
-      copyBtn.classList.add('hidden');
-      setStatus('Cleared');
-    }
+async function loadInbox(){if(!currentEmail){showToast('Generate an email first'); return;} setStatus('Loading inbox…'); inboxList.innerHTML='<div class="text-sm text-white/60">Loading…</div>'; 
+try{const data=await safeFetch('/api/tempmail?op=inbox&email='+encodeURIComponent(currentEmail)); let messages=[]; if(Array.isArray(data?.result)) messages=data.result; else if(Array.isArray(data?.result?.messages)) messages=data.result.messages; else if(Array.isArray(data?.messages)) messages=data.messages; else if(Array.isArray(data)) messages=data; currentInbox=messages||[]; 
+if(!currentInbox.length){inboxList.innerHTML='<div class="text-sm text-white/50">No messages yet.</div>'; inboxCount.innerText=0; setStatus('Inbox empty'); return;} 
+inboxList.innerHTML=''; inboxCount.innerText=currentInbox.length; 
+currentInbox.forEach((m,idx)=>{const from=m.from||m.sender||m.mail_from||m.address||'Unknown'; const subject=m.subject||m.title||'(no subject)'; const mid=m.id||m.messageid||m.message_id||m.msgid||m.idMessage||idx; const time=m.time||m.date||''; const li=document.createElement('div'); li.className='p-3 rounded-lg bg-slate-800 hover:bg-slate-700 cursor-pointer transition-colors'; 
+li.innerHTML=`<div class="flex justify-between items-start gap-2"><div class="flex-1"><div class="text-sm text-white/50">${escapeHtml(from)}</div><div class="font-semibold mt-1">${escapeHtml(subject)}</div><div class="text-xs text-white/40 mt-1">${escapeHtml(time)}</div></div><div class="text-xs text-white/40 ml-2">#${mid}</div></div>`; 
+li.onclick=()=>loadMessage(mid,m); inboxList.appendChild(li);}); setStatus('Inbox loaded');} catch(err){console.error(err); inboxList.innerHTML='<div class="text-sm text-red-400">❌ Failed to load inbox</div>'; setStatus('❌ Inbox error');}}
 
-    async function loadInbox() {
-      if (!currentEmail) return showToast('Generate an email first');
-      setStatus('Loading inbox…');
-      inboxList.innerHTML = '<div class="text-sm text-white/60">Loading…</div>';
-      try {
-        const data = await safeFetch('/api/tempmail?op=inbox&email=' + encodeURIComponent(currentEmail));
-        let messages = [];
-        if (Array.isArray(data?.result)) messages = data.result;
-        else if (Array.isArray(data?.result?.messages)) messages = data.result.messages;
-        else if (Array.isArray(data?.messages)) messages = data.messages;
-        else if (Array.isArray(data)) messages = data;
+async function loadMessage(messageId,knownMsgObj=null){if(!currentEmail) return showToast('No email set'); setStatus('Loading message…'); noMessage.classList.add('hidden'); messageContent.classList.remove('hidden'); msgFrom.innerText=''; msgSubject.innerText=''; msgBody.innerHTML='Loading…'; 
+try{if(knownMsgObj&&(knownMsgObj.body||knownMsgObj.text||knownMsgObj.html)){renderMessage(knownMsgObj); setStatus('Message loaded (local)'); return;} 
+const data=await safeFetch('/api/tempmail?op=message&email='+encodeURIComponent(currentEmail)+'&messageid='+encodeURIComponent(messageId)); const payload=data?.result||data; renderMessage(payload); setStatus('Message loaded');} 
+catch(err){console.error(err); msgBody.innerHTML='<div class="text-red-400">❌ Failed to load message</div>'; setStatus('❌ Message error');}}
 
-        currentInbox = messages || [];
+function renderMessage(payload){if(!payload){msgBody.innerHTML='<div class="text-red-400">No content</div>'; return;} 
+const from=payload.from||payload.sender||payload.mail_from||payload.address||'Unknown'; const subject=payload.subject||payload.title||'(no subject)'; const body=payload.body||payload.html||payload.text||payload.message||JSON.stringify(payload,null,2); 
+msgFrom.innerText=from; msgSubject.innerText=subject; 
+if(looksLikeHtml(body)) msgBody.innerHTML=body; else msgBody.innerText=body; 
+currentMessage=payload;}
 
-        if (!currentInbox.length) {
-          inboxList.innerHTML = '<div class="text-sm text-white/50">No messages yet.</div>';
-          inboxCount.innerText = 0;
-          setStatus('Inbox empty');
-          return;
-        }
-        inboxList.innerHTML = '';
-        inboxCount.innerText = currentInbox.length;
-        currentInbox.forEach((m, idx) => {
-          const from = m.from || m.sender || m.mail_from || m.address || 'Unknown';
-          const subject = m.subject || m.title || m.heading || '(no subject)';
-          const mid = m.id || m.messageid || m.message_id || m.msgid || m.idMessage || idx;
-          const time = m.time || m.date || '';
-          const li = document.createElement('div');
-          li.className = 'p-3 rounded-lg bg-slate-800 hover:bg-slate-700 cursor-pointer transition-colors';
-          li.innerHTML = `
-            <div class="flex justify-between items-start gap-2">
-              <div class="flex-1">
-                <div class="text-sm text-white/50">${from}</div>
-                <div class="font-semibold mt-1">${escapeHtml(subject)}</div>
-                <div class="text-xs text-white/40 mt-1">${time}</div>
-              </div>
-              <div class="text-xs text-white/40 ml-2">#${mid}</div>
-            </div>
-          `;
-          li.onclick = () => loadMessage(mid, m);
-          inboxList.appendChild(li);
-        });
-        setStatus('Inbox loaded');
-      } catch (err) {
-        console.error(err);
-        inboxList.innerHTML = '<div class="text-sm text-red-400">❌ Failed to load inbox</div>';
-        setStatus('❌ Inbox error');
-      }
-    }
+// Open Raw Modal
+openRawBtn.addEventListener('click',()=>{
+  if(!currentMessage) return showToast('No message selected');
+  modalSubject.innerText=currentMessage.subject||'Message';
+  modalFrom.innerText=currentMessage.from||currentMessage.sender||'Unknown';
+  const raw=currentMessage.body||currentMessage.html||currentMessage.text||JSON.stringify(currentMessage,null,2);
+  modalBody.innerText=raw;
+  rawModal.style.display='flex';
+});
 
-    async function loadMessage(messageId, knownMsgObj = null) {
-      if (!currentEmail) return showToast('No email set');
-      setStatus('Loading message…');
-      noMessage.classList.add('hidden'); messageContent.classList.remove('hidden');
-      msgFrom.innerText = ''; msgSubject.innerText = ''; msgBody.innerHTML = 'Loading…';
-      try {
-        if (knownMsgObj && (knownMsgObj.body || knownMsgObj.text || knownMsgObj.html)) {
-          renderMessage(knownMsgObj);
-          setStatus('Message loaded (local)');
-          return;
-        }
-        const data = await safeFetch('/api/tempmail?op=message&email=' + encodeURIComponent(currentEmail) + '&messageid=' + encodeURIComponent(messageId));
-        const payload = data?.result || data;
-        renderMessage(payload);
-        setStatus('Message loaded');
-      } catch (err) {
-        console.error(err);
-        msgBody.innerHTML = '<div class="text-red-400">❌ Failed to load message</div>';
-        setStatus('❌ Message error');
-      }
-    }
+modalClose.addEventListener('click',()=>{rawModal.style.display='none';});
+modalCopy.addEventListener('click',()=>{
+  navigator.clipboard.writeText(modalBody.innerText).then(()=>{modalCopy.innerText='✅ Copied'; setTimeout(()=>modalCopy.innerText='📋 Copy',1500);}).catch(()=>alert('Copy failed'));
+});
 
-    function renderMessage(payload) {
-      if (!payload) { msgBody.innerHTML = '<div class="text-red-400">No content</div>'; return; }
-      const from = payload.from || payload.sender || payload.mail_from || payload.address || 'Unknown';
-      const subject = payload.subject || payload.title || '(no subject)';
-      const body = payload.body || payload.html || payload.text || payload.message || JSON.stringify(payload, null, 2);
-      msgFrom.innerText = from;
-      msgSubject.innerText = subject;
-      if (looksLikeHtml(body)) msgBody.innerHTML = body;
-      else msgBody.innerText = body;
-      currentMessage = payload;
-    }
+// Download
+downloadBtn.addEventListener('click',()=>{
+  if(!currentMessage) return showToast('No message selected');
+  const raw=currentMessage.body||currentMessage.html||currentMessage.text||JSON.stringify(currentMessage,null,2);
+  const blob=new Blob([raw],{type:'text/plain'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url;
+  a.download=(currentMessage.subject?currentMessage.subject.replaceAll(/\s+/g,'_'):'message')+'.txt';
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); showToast('Downloaded');
+});
 
-    function looksLikeHtml(s) { return s && typeof s === 'string' && /<\/?[a-z][\s\S]*>/i.test(s); }
-    function escapeHtml(text) {
-      if (!text && text !== 0) return '';
-      return String(text).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
-    }
+// Buttons
+generateBtn.addEventListener('click',generateEmail);
+copyBtn.addEventListener('click',copyEmail);
+refreshInboxBtn.addEventListener('click',loadInbox);
+clearBtn.addEventListener('click',clearAll);
 
-    openRawBtn.addEventListener('click', () => {
-      if (!currentMessage) return showToast('No message selected');
-      const raw = currentMessage.body || currentMessage.html || currentMessage.text || JSON.stringify(currentMessage, null, 2);
-      const w = window.open('', '_blank');
-      if (!w) return showToast('Popup blocked');
-
-      w.document.write(`
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <title>Raw Message — ${escapeHtml(currentMessage.subject || 'Message')}</title>
-          <style>
-            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(to bottom right, #1e1e2f, #2c2c3f); color: #f8f8f; padding: 2rem; }
-            h1 { font-size: 1.5rem; margin-bottom: 1rem; color: #ff79c6; }
-            .meta { margin-bottom: 1rem; color: #8be9fd; }
-            pre { background-color: #282a36; border-radius: 8px; padding: 1rem; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
-            button { margin-bottom: 1rem; padding: 0.5rem 1rem; background: #50fa7b; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: #000; transition: transform 0.1s; }
-            button:hover { transform: scale(1.05); }
-          </style>
-        </head>
-        <body>
-          <h1>${escapeHtml(currentMessage.subject || 'Message')}</h1>
-          <div class="meta"><strong>From:</strong> ${escapeHtml(currentMessage.from || currentMessage.sender || 'Unknown')}</div>
-          <button id="copyBtn">📋 Copy</button>
-          <pre id="rawContent">${escapeHtml(raw)}</pre>
-          <script>
-            const copyBtn = document.getElementById('copyBtn');
-            const rawContent = document.getElementById('rawContent');
-            copyBtn.addEventListener('click', () => {
-              navigator.clipboard.writeText(rawContent.innerText).then(() => {
-                copyBtn.innerText = '✅ Copied';
-                setTimeout(() => copyBtn.innerText = '📋 Copy', 1500);
-              }).catch(() => alert('Copy failed'));
-            });
-          </script>
-        </body>
-        </html>
-  </script>
-
-  <!-- Monetag Script -->
-  <script src="https://fpyf8.com/88/tag.min.js" data-zone="174168" async data-cfasync="false"></script>
+// Auto load email from query string
+(function checkQueryEmail(){try{const params=new URLSearchParams(location.search); const e=params.get('email'); if(e){currentEmail=e; generatedEmail.value=e; copyBtn.classList.remove('hidden'); loadInbox();}}catch(err){}})();
+</script>
 </body>
 </html>

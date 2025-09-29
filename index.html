@@ -4,60 +4,154 @@
   <meta charset="UTF-8">
   <title>Temp Mail by Kami Flex</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Loader */
+    .loader {
+      border: 4px solid rgba(255,255,255,0.2);
+      border-top: 4px solid #a855f7;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Glass Effect */
+    .glass {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+  </style>
   <script>
+    function showLoader(id) {
+      document.getElementById(id).innerHTML = '<div class="loader"></div>';
+      if (id === "generatedEmail") {
+        document.getElementById("copyBtn").classList.add("hidden");
+      }
+    }
+
+    function showError(id, msg) {
+      document.getElementById(id).innerHTML = `<p class="text-red-400 font-semibold">❌ ${msg}</p>`;
+      if (id === "generatedEmail") {
+        document.getElementById("copyBtn").classList.add("hidden");
+      }
+    }
+
     async function generateEmail() {
-      const res = await fetch("/api/tempmail?op=generate");
-      const data = await res.json();
-      document.getElementById("generatedEmail").innerText = data.email || JSON.stringify(data);
-      document.getElementById("emailInput").value = data.email || "";
+      showLoader("generatedEmail");
+      try {
+        const res = await fetch("/api/tempmail?op=generate");
+        if (!res.ok) throw new Error("API request failed");
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        const email = data.email || "";
+        document.getElementById("generatedEmail").innerText = email;
+        document.getElementById("emailInput").value = email;
+
+        if (email) {
+          document.getElementById("copyBtn").classList.remove("hidden");
+        }
+      } catch (err) {
+        showError("generatedEmail", err.message);
+      }
     }
 
     async function getInbox() {
       const email = document.getElementById("emailInput").value;
       if (!email) return alert("⚠️ Please enter email first");
-      const res = await fetch(`/api/tempmail?op=inbox&email=${email}`);
-      const data = await res.json();
-      document.getElementById("inbox").innerText = JSON.stringify(data, null, 2);
+      showLoader("inbox");
+      try {
+        const res = await fetch(`/api/tempmail?op=inbox&email=${email}`);
+        if (!res.ok) throw new Error("API request failed");
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        document.getElementById("inbox").innerText = JSON.stringify(data, null, 2);
+      } catch (err) {
+        showError("inbox", err.message);
+      }
     }
 
     async function getMessage() {
       const email = document.getElementById("emailInput").value;
       const messageid = document.getElementById("messageIdInput").value;
       if (!email || !messageid) return alert("⚠️ Please enter both email and message ID");
-      const res = await fetch(`/api/tempmail?op=message&email=${email}&messageid=${messageid}`);
-      const data = await res.json();
-      document.getElementById("message").innerText = JSON.stringify(data, null, 2);
+      showLoader("message");
+      try {
+        const res = await fetch(`/api/tempmail?op=message&email=${email}&messageid=${messageid}`);
+        if (!res.ok) throw new Error("API request failed");
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        document.getElementById("message").innerText = JSON.stringify(data, null, 2);
+      } catch (err) {
+        showError("message", err.message);
+      }
+    }
+
+    function copyEmail() {
+      const email = document.getElementById("generatedEmail").innerText;
+      if (!email || email === "---") return;
+      navigator.clipboard.writeText(email).then(() => {
+        const btn = document.getElementById("copyBtn");
+        btn.innerText = "✅ Copied!";
+        setTimeout(() => {
+          btn.innerText = "📋 Copy";
+        }, 2000);
+      });
     }
   </script>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-6">
-  <h1 class="text-3xl font-bold text-indigo-400 mb-6">📧 Temp Mail by Kami Flex</h1>
+<body class="bg-gradient-to-br from-gray-900 via-purple-900 to-black text-white min-h-screen flex flex-col items-center p-6">
+  <!-- Header -->
+  <h1 class="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-pink-500 via-purple-400 to-indigo-400 bg-clip-text text-transparent mb-10 text-center drop-shadow-lg">
+    ⚡ Temp Mail by Kami Flex ⚡
+  </h1>
 
-  <div class="bg-gray-800 p-6 rounded-2xl shadow-lg w-full max-w-lg mb-6">
-    <button onclick="generateEmail()" class="bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-lg text-white font-semibold">
-      Generate Temp Email
+  <!-- Generate Email -->
+  <div class="glass p-8 rounded-3xl shadow-2xl w-full md:max-w-2xl mb-8 hover:scale-105 transition-transform duration-300">
+    <button onclick="generateEmail()" class="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 px-6 py-3 rounded-xl text-white font-bold w-full md:w-auto shadow-lg">
+      🎲 Generate Temp Email
     </button>
-    <p class="mt-4"><b>Generated Email:</b> <span id="generatedEmail" class="text-green-400">---</span></p>
+    <div class="mt-4 flex items-center gap-3">
+      <p class="text-lg font-semibold text-green-400 break-all">
+        <span id="generatedEmail">---</span>
+      </p>
+      <button id="copyBtn" onclick="copyEmail()" class="hidden bg-gradient-to-r from-green-500 to-emerald-500 hover:opacity-90 px-3 py-2 rounded-lg text-white text-sm shadow-md">
+        📋 Copy
+      </button>
+    </div>
   </div>
 
-  <div class="bg-gray-800 p-6 rounded-2xl shadow-lg w-full max-w-lg mb-6">
-    <h2 class="text-xl font-semibold text-yellow-400 mb-2">Check Inbox</h2>
+  <!-- Inbox -->
+  <div class="glass p-8 rounded-3xl shadow-2xl w-full md:max-w-2xl mb-8 hover:scale-105 transition-transform duration-300">
+    <h2 class="text-2xl font-bold text-yellow-400 mb-3">📥 Check Inbox</h2>
     <input type="text" id="emailInput" placeholder="Enter your temp email"
-           class="w-full px-3 py-2 rounded-lg text-black mb-3">
-    <button onclick="getInbox()" class="bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded-lg text-white font-semibold">
-      Get Inbox
+           class="w-full px-4 py-3 rounded-xl text-black mb-4 shadow-inner">
+    <button onclick="getInbox()" class="bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 px-6 py-3 rounded-xl text-white font-bold w-full md:w-auto shadow-lg">
+      🔍 Get Inbox
     </button>
-    <pre id="inbox" class="bg-black text-green-300 p-3 mt-4 rounded-lg overflow-x-auto text-sm"></pre>
+    <pre id="inbox" class="glass text-green-300 p-4 mt-4 rounded-xl overflow-x-auto text-sm md:text-base"></pre>
   </div>
 
-  <div class="bg-gray-800 p-6 rounded-2xl shadow-lg w-full max-w-lg">
-    <h2 class="text-xl font-semibold text-pink-400 mb-2">Read Message</h2>
+  <!-- Message -->
+  <div class="glass p-8 rounded-3xl shadow-2xl w-full md:max-w-2xl hover:scale-105 transition-transform duration-300">
+    <h2 class="text-2xl font-bold text-pink-400 mb-3">💌 Read Message</h2>
     <input type="text" id="messageIdInput" placeholder="Enter Message ID"
-           class="w-full px-3 py-2 rounded-lg text-black mb-3">
-    <button onclick="getMessage()" class="bg-pink-500 hover:bg-pink-600 px-4 py-2 rounded-lg text-white font-semibold">
-      Get Message
+           class="w-full px-4 py-3 rounded-xl text-black mb-4 shadow-inner">
+    <button onclick="getMessage()" class="bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90 px-6 py-3 rounded-xl text-white font-bold w-full md:w-auto shadow-lg">
+      📖 Get Message
     </button>
-    <pre id="message" class="bg-black text-blue-300 p-3 mt-4 rounded-lg overflow-x-auto text-sm"></pre>
+    <pre id="message" class="glass text-blue-300 p-4 mt-4 rounded-xl overflow-x-auto text-sm md:text-base"></pre>
   </div>
+
+  <!-- Footer -->
+  <footer class="mt-12 text-gray-400 text-sm">
+    🚀 Powered by <span class="text-indigo-400 font-semibold">Kami Flex</span>
+  </footer>
 </body>
 </html>

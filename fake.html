@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kami Flex Fake Number</title>
+  <style>
+    :root{--bg:#071a2a;--card:rgba(255,255,255,0.04);--muted:#9aa4b2;--accent:#06b6d4}
+    body{font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,#071024,#071a2a);color:#e6eef6;margin:0;padding:18px}
+    .wrap{max-width:1100px;margin:0 auto}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    h1{margin:0 0 6px 0}
+    .meta{font-size:13px;color:var(--muted)}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px}
+    input,select,button{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit}
+    button{background:var(--accent);color:#042;border:0;cursor:pointer}
+    .card{background:var(--card);padding:12px;border-radius:10px;margin-top:12px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+    .daily{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .item{padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer}
+    .small{font-size:13px;color:var(--muted)}
+    .copy{padding:6px 10px;border-radius:6px;background:#173644;color:#cfe8ea;border:0;cursor:pointer}
+    .otp{font-weight:700;color:#b7ff6a;margin-left:10px;cursor:pointer}
+    .list{display:grid;gap:8px;margin-top:8px}
+    .pagination{display:flex;gap:8px;justify-content:center;margin-top:14px;align-items:center}
+    textarea#log{width:100%;height:160px;margin-top:12px;border-radius:8px;background:#02101a;color:#cfe8ea;border:0;padding:10px;resize:vertical}
+    @media(max-width:900px){.daily{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}
+    @media(max-width:560px){.daily{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Kami Flex Fake Number</h1>
+        <div class="meta">All Countries (from API) • 20 numbers per page • Top 12 daily • Copy & OTP</div>
+      </div>
+      <div style="min-width:220px">
+        <label class="small">App ID</label><br/>
+        <input id="appInput" placeholder="global--AF-93" value="global--AF-93" style="width:100%"/>
+      </div>
+    </header>
+
+    <div class="controls">
+      <select id="countrySelect" style="min-width:220px"></select>
+      <input id="carrierInput" placeholder="Carrier (e.g. 619)" />
+      <button id="loadBtn">Load Page</button>
+      <button id="refreshBtn">Refresh OTPs</button>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+        <button id="prevBtn">Prev</button>
+        <div id="pageInfo" class="small" style="padding:6px 10px;background:rgba(255,255,255,0.02);border-radius:8px">Page 1</div>
+        <button id="nextBtn">Next</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 8px 0">Daily top 12</h3>
+      <div id="daily" class="daily"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 8px 0">Other numbers (rest of page)</h3>
+      <div id="list" class="list"></div>
+      <div class="pagination">
+        <span class="small">Showing 20 per page</span>
+      </div>
+    </div>
+
+    <textarea id="log" readonly placeholder="Logs & raw responses"></textarea>
+  </div>
+
+<script>
+  async function api(params = {}) {
+    const url = '/api/fake?' + new URLSearchParams(params).toString();
+    const res = await fetch(url, {cache: 'no-store'});
+    const text = await res.text();
+    return text;
+  }
+
+  let currentPage = 1;
+  const PAGE_SIZE = 20;
+  let numbersCache = [];
+
+  const countrySelect = document.getElementById('countrySelect');
+  const appInput = document.getElementById('appInput');
+  const carrierInput = document.getElementById('carrierInput');
+  const dailyEl = document.getElementById('daily');
+  const listEl = document.getElementById('list');
+  const logEl = document.getElementById('log');
+  const pageInfo = document.getElementById('pageInfo');
+
+  document.getElementById('loadBtn').addEventListener('click', ()=>loadPage(1));
+  document.getElementById('refreshBtn').addEventListener('click', refreshOtps);
+  document.getElementById('prevBtn').addEventListener('click', ()=>{ if(currentPage>1) loadPage(currentPage-1); });
+  document.getElementById('nextBtn').addEventListener('click', ()=>loadPage(currentPage+1));
+  countrySelect.addEventListener('change', ()=>loadPage(1));
+
+  async function loadCountries(){
+    try {
+      const txt = await api({ type: 'countries' });
+      let data;
+      try { data = JSON.parse(txt); } catch(e){ data = null; }
+      countrySelect.innerHTML = '';
+      if(Array.isArray(data?.data)){
+        data.data.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.code || c.id || c.name;
+          opt.textContent = c.name || c.country || c.code;
+          countrySelect.appendChild(opt);
+        });
+      } else {
+        const opt = document.createElement('option'); opt.value='all'; opt.textContent='All Countries'; countrySelect.appendChild(opt);
+      }
+    } catch(err){
+      log('Countries fetch failed: ' + err.message);
+      countrySelect.innerHTML = '<option>All Countries (error)</option>';
+    }
+  }
+
+  async function loadPage(page=1){
+    currentPage = page;
+    pageInfo.textContent = 'Loading...';
+    numbersCache = [];
+    dailyEl.innerHTML = '';
+    listEl.innerHTML = '';
+    const app = appInput.value || undefined;
+    const carrier = carrierInput.value || undefined;
+    const calls = Array.from({length: PAGE_SIZE}, ()=>api({ type: 'number', app, carrier }));
+    const results = await Promise.allSettled(calls);
+
+    for(let r of results){
+      const item = { number:'', id:'', raw:'', otp:null };
+      if(r.status==='fulfilled'){
+        item.raw = r.value;
+        try{
+          const j = JSON.parse(r.value);
+          item.id = j.data?.id || j.id || '';
+          item.number = j.data?.number || j.number || '';
+        }catch(e){
+          const m = r.value.match(/\d{6,15}/); item.number = m?m[0]: '';
+          const m2 = r.value.match(/\b[0-9]{4,12}\b/); item.id = m2?m2[0]:'';
+        }
+      }else{ item.raw='ERROR: '+(r.reason?.message||String(r.reason)); }
+      numbersCache.push(item);
+    }
+    renderNumbers();
+    await refreshOtps();
+  }
+
+  function renderNumbers(){
+    dailyEl.innerHTML=''; listEl.innerHTML='';
+    numbersCache.forEach((n,idx)=>{
+      const node = buildRow(n,idx);
+      if(idx<12){ dailyEl.appendChild(node); } else { listEl.appendChild(node); }
+    });
+  }
+
+  function buildRow(item){
+    const el = document.createElement('div'); el.className='item';
+    const left = document.createElement('div');
+    left.innerHTML=`<div style="font-weight:700">${escapeHtml(item.number)}</div>
+                    <div class="small">id: ${escapeHtml(item.id)}</div>`;
+    const right = document.createElement('div');
+    const copyBtn = document.createElement('button'); copyBtn.className='copy'; copyBtn.textContent='Copy';
+    copyBtn.onclick = async ()=>{ try{ await navigator.clipboard.writeText(item.number||''); copyBtn.textContent='Copied'; setTimeout(()=>copyBtn.textContent='Copy',1200); } catch(e){ copyBtn.textContent='Err'; setTimeout(()=>copyBtn.textContent='Copy',1200);} };
+    const otpSpan = document.createElement('span'); otpSpan.className='otp'; otpSpan.textContent = item.otp||'';
+    otpSpan.onclick = async ()=>{
+      if(item.otp){
+        try{ await navigator.clipboard.writeText(item.otp); otpSpan.textContent='Copied'; setTimeout(()=>otpSpan.textContent=item.otp,1200);}catch(e){otpSpan.textContent='Err'; setTimeout(()=>otpSpan.textContent=item.otp,1200);}
+      }
+    };
+    right.appendChild(copyBtn);
+    right.appendChild(otpSpan);
+    el.appendChild(left);
+    el.appendChild(right);
+    return el;
+  }
+
+  async function refreshOtps(){
+    log('Refreshing OTPs...');
+    try {
+      const txt = await api({ type:'otp' });
+      let parsed;
+      try{ parsed = JSON.parse(txt); }catch(e){ parsed=null; }
+      const matches = (txt.match(/\b[0-9]{4,8}\b/g)||[]).slice(0,200);
+      for(const m of matches){
+        let attached=false;
+        for(const it of numbersCache){
+          if(it.raw && it.raw.includes(m) && !it.otp){ it.otp=m; attached=true; break; }
+        }
+        if(!attached){
+          for(const it of numbersCache){
+            if(!it.otp){ it.otp=m; attached=true; break; }
+          }
+        }
+      }
+      renderNumbers();
+    } catch(err){
+      log('OTP fetch error: '+err.message);
+    }
+  }
+
+  function log(msg){
+    const ts = new Date().toLocaleString();
+    logEl.value=`[${ts}] ${msg}\n\n`+logEl.value;
+  }
+  function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  loadCountries().then(()=>loadPage(1));
+</script>
+</body>
+</html>

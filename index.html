@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>⚡ Temp Mail — Kami Flex ⚡</title>
-
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Temp Mail — Kami Flex</title>
 
   <!-- Monetag -->
   <meta name="monetag" content="b805f1bd7c6023d0341a4d15bd8fe547">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     /* small custom styles */
@@ -24,6 +24,7 @@
       background-clip: text;
       color: transparent;
     }
+    /* large centered loader */
     .center-loader {
       position: fixed;
       inset: 0;
@@ -48,6 +49,11 @@
 </head>
 <body class="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-black text-white antialiased">
 
+  <!-- Back Button -->
+  <div class="p-4">
+    <button onclick="location.href='index.html'" class="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600">⬅</button>
+  </div>
+
   <!-- Center fullpage loader (hidden by default) -->
   <div id="fullLoader" class="center-loader hidden">
     <div class="flex flex-col items-center gap-4">
@@ -62,16 +68,11 @@
     <!-- Header / Hero -->
     <header class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
       <div class="flex items-center gap-4">
-        <button onclick="window.location.href='index.html'" class="px-3 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-white text-sm">
-          ⬅
-        </button>
-
         <div class="w-14 h-14 rounded-xl flex items-center justify-center bg-gradient-to-tr from-pink-500 to-indigo-500 shadow-lg">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="text-white">
             <path d="M3 8.5L12 3l9 5.5V17a2 2 0 0 1-2 2h-3v-5H8v5H5a2 2 0 0 1-2-2V8.5z" fill="white" />
           </svg>
         </div>
-
         <div>
           <h1 class="text-2xl md:text-3xl font-extrabold neon-text">⚡ Temp Mail <span class="text-white/70 font-semibold">by Kami Flex ⚡</span></h1>
           <p class="text-sm text-white/60 mt-1">Disposable temp-mail — generate, check inbox and read messages (10 minute expiry)</p>
@@ -161,7 +162,7 @@
   <!-- Toast -->
   <div id="toast" class="fixed right-6 bottom-6 hidden bg-black/80 text-white px-4 py-2 rounded-lg shadow-lg z-50"></div>
 
-  <!-- Inline script (full features, no external JS file required) -->
+  <!-- Inline script -->
   <script>
     const generateBtn = document.getElementById('generateBtn');
     const copyBtn = document.getElementById('copyBtn');
@@ -193,7 +194,6 @@
     }
 
     function setStatus(txt) { statusText.innerText = txt; }
-
     function showFullLoader(show = true) { fullLoader.classList.toggle('hidden', !show); }
 
     async function safeFetch(url, opts = {}, timeout = 15000) {
@@ -204,7 +204,10 @@
         clearTimeout(id);
         if (!res.ok) throw new Error('Network response not OK: ' + res.status);
         return await res.json();
-      } catch (err) { clearTimeout(id); throw err; }
+      } catch (err) {
+        clearTimeout(id);
+        throw err;
+      }
     }
 
     async function generateEmail() {
@@ -213,23 +216,35 @@
       try {
         const data = await safeFetch('/api/tempmail?op=generate');
         const email = data?.result?.email || data?.email || '';
-        if (!email) { setStatus('❌ No email returned'); showFullLoader(false); return showToast('Generate failed — API returned unexpected data', 3000); }
+        if (!email) {
+          setStatus('❌ No email returned');
+          showFullLoader(false);
+          return showToast('Generate failed — API returned unexpected data', 3000);
+        }
         currentEmail = email;
         generatedEmail.value = email;
         copyBtn.classList.remove('hidden');
         setStatus('✅ Email generated');
         showToast('Email generated: ' + email, 2000);
         await loadInbox();
-      } catch (err) { console.error(err); setStatus('❌ Generate Error'); showToast('API error: ' + (err.message || err), 4000); }
-      finally { showFullLoader(false); }
+      } catch (err) {
+        console.error(err);
+        setStatus('❌ Generate Error');
+        showToast('API error: ' + (err.message || err), 4000);
+      } finally { showFullLoader(false); }
     }
 
     function copyEmail() {
       if (!currentEmail) return showToast('No email to copy');
-      navigator.clipboard.writeText(currentEmail).then(() => { showToast('Copied to clipboard'); copyBtn.innerText = '✅ Copied'; setTimeout(() => copyBtn.innerText = '📋 Copy', 1500); }).catch(() => showToast('Copy failed'));
+      navigator.clipboard.writeText(currentEmail).then(() => {
+        showToast('Copied to clipboard');
+        copyBtn.innerText = '✅ Copied';
+        setTimeout(() => copyBtn.innerText = '📋 Copy', 1500);
+      }).catch(() => showToast('Copy failed'));
     }
 
-    function clearAll() {currentEmail = '';
+    function clearAll() {
+      currentEmail = '';
       currentInbox = [];
       currentMessage = null;
       generatedEmail.value = '—';
@@ -336,40 +351,42 @@
       const raw = currentMessage.body || currentMessage.html || currentMessage.text || JSON.stringify(currentMessage, null, 2);
       const w = window.open('', '_blank');
       if (!w) return showToast('Popup blocked');
-      w.document.write('<pre style="white-space:pre-wrap;word-wrap:break-word;font-family:monospace;">' + escapeHtml(raw) + '</pre>');
-      w.document.close();
-    });
 
-    downloadBtn.addEventListener('click', () => {
-      if (!currentMessage) return showToast('No message selected');
-      const raw = currentMessage.body || currentMessage.html || currentMessage.text || JSON.stringify(currentMessage, null, 2);
-      const blob = new Blob([raw], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = (currentMessage.subject ? currentMessage.subject.replaceAll(/\s+/g,'_') : 'message') + '.txt';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      showToast('Downloaded');
-    });
-
-    generateBtn.addEventListener('click', generateEmail);
-    copyBtn.addEventListener('click', copyEmail);
-    refreshInboxBtn.addEventListener('click', loadInbox);
-    clearBtn.addEventListener('click', clearAll);
-
-    (function checkQueryEmail() {
-      try {
-        const params = new URLSearchParams(location.search);
-        const e = params.get('email');
-        if (e) { currentEmail = e; generatedEmail.value = e; copyBtn.classList.remove('hidden'); loadInbox(); }
-      } catch (err) { }
-    })();
+      w.document.write(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <title>Raw Message — ${escapeHtml(currentMessage.subject || 'Message')}</title>
+          <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(to bottom right, #1e1e2f, #2c2c3f); color: #f8f8f; padding: 2rem; }
+            h1 { font-size: 1.5rem; margin-bottom: 1rem; color: #ff79c6; }
+            .meta { margin-bottom: 1rem; color: #8be9fd; }
+            pre { background-color: #282a36; border-radius: 8px; padding: 1rem; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+            button { margin-bottom: 1rem; padding: 0.5rem 1rem; background: #50fa7b; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: #000; transition: transform 0.1s; }
+            button:hover { transform: scale(1.05); }
+          </style>
+        </head>
+        <body>
+          <h1>${escapeHtml(currentMessage.subject || 'Message')}</h1>
+          <div class="meta"><strong>From:</strong> ${escapeHtml(currentMessage.from || currentMessage.sender || 'Unknown')}</div>
+          <button id="copyBtn">📋 Copy</button>
+          <pre id="rawContent">${escapeHtml(raw)}</pre>
+          <script>
+            const copyBtn = document.getElementById('copyBtn');
+            const rawContent = document.getElementById('rawContent');
+            copyBtn.addEventListener('click', () => {
+              navigator.clipboard.writeText(rawContent.innerText).then(() => {
+                copyBtn.innerText = '✅ Copied';
+                setTimeout(() => copyBtn.innerText = '📋 Copy', 1500);
+              }).catch(() => alert('Copy failed'));
+            });
+          </script>
+        </body>
+        </html>
   </script>
 
-  <!-- Monetag script -->
+  <!-- Monetag Script -->
   <script src="https://fpyf8.com/88/tag.min.js" data-zone="174168" async data-cfasync="false"></script>
 </body>
 </html>

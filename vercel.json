@@ -1,11 +1,11 @@
 {
   "version": 2,
   "builds": [
-    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "temp.html", "use": "@vercel/static" },
     { "src": "tempmail.js", "use": "@vercel/node" }
   ],
   "routes": [
-    { "src": "/", "dest": "/index.html" },
+    { "src": "/", "dest": "/temp.html" },
     { "src": "/api/tempmail", "dest": "/tempmail.js" }
   ]
 }

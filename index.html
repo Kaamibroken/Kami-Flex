@@ -4,29 +4,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Temp Mail — Kami Flex</title>
+
+<!-- Monetag -->
 <meta name="monetag" content="b805f1bd7c6023d0341a4d15bd8fe547">
+
+<!-- FPYF8 Script -->
+<script src="https://fpyf8.com/88/tag.min.js" data-zone="174168" async data-cfasync="false"></script>
+
+<!-- Tailwind CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
+
 <style>
-  .glass { background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); backdrop-filter: blur(10px); border:1px solid rgba(255,255,255,0.06); }
-  .neon-text { background: linear-gradient(90deg, #ff7ad1, #7c5cff, #42d9ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
-  .center-loader { position: fixed; inset:0; display:grid; place-items:center; z-index:60; background: rgba(2,6,23,0.55);}
-  @keyframes spin {0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-  /* Modal */
-  .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:70; align-items:center; justify-content:center; }
-  .modal-content { background:#0f0f1a; padding:2rem; border-radius:12px; max-width:90%; max-height:80%; overflow:auto; color:#f8f8f2; font-family:monospace; box-shadow:0 0 25px rgba(0,0,0,0.7); position:relative;}
-  .modal-close { position:absolute; top:1rem; right:1rem; cursor:pointer; background:#ff5555; color:#fff; border:none; border-radius:8px; padding:0.3rem 0.8rem; font-weight:bold; }
-  .modal-header { font-size:1.5rem; color:#ff79c6; margin-bottom:1rem; }
-  .modal-meta { color:#8be9fd; margin-bottom:1rem; }
-  .modal-copy { background:#50fa7b; color:#000; border:none; padding:0.5rem 1rem; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom:1rem; transition:0.1s; }
-  .modal-copy:hover { transform:scale(1.05); }
-  pre { background:#282a36; border-radius:10px; padding:1rem; overflow-x:auto; white-space:pre-wrap; word-wrap:break-word; }
+/* Basic styles + glass + neon */
+body { font-family: 'Roboto', Arial, sans-serif; }
+.glass { background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); backdrop-filter: blur(10px); border:1px solid rgba(255,255,255,0.06);}
+.neon-text { background: linear-gradient(90deg, #ff7ad1, #7c5cff, #42d9ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.center-loader { position: fixed; inset:0; display:grid; place-items:center; z-index:60; background: rgba(2,6,23,0.55);}
+@keyframes spin {0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
 </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-black text-white antialiased">
 
-<!-- Back Button -->
+<!-- Back to Home -->
 <div class="p-4">
-  <button onclick="location.href='index.html'" class="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600">⬅ Back</button>
+  <button onclick="location.href='index.html'" class="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600">⬅ Home</button>
 </div>
 
 <!-- Loader -->
@@ -56,6 +57,16 @@
       <button id="copyBtn" class="px-4 py-2 rounded-xl bg-green-500 text-black font-semibold hidden">📋 Copy</button>
     </div>
   </header>
+
+  <!-- Monetag ad placement example -->
+  <div class="mb-6">
+    <div data-monetag-zone="b805f1bd7c6023d0341a4d15bd8fe547" class="w-full h-20 bg-black rounded-lg"></div>
+  </div>
+
+  <!-- FPYF8 ad placement -->
+  <div class="mb-6">
+    <div id="fpyf8-ad" class="w-full h-20 bg-black rounded-lg"></div>
+  </div>
 
   <!-- Main Grid -->
   <main class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -111,10 +122,10 @@
   </main>
 </div>
 
-<!-- Modal -->
-<div id="rawModal" class="modal-bg flex">
+<!-- Gmail-style Open Raw Modal -->
+<div id="rawModal" class="modal-bg hidden">
   <div class="modal-content">
-    <button id="modalClose" class="modal-close">✖ Close</button>
+    <button id="modalClose" class="modal-close">⬅ Back</button>
     <div class="modal-header" id="modalSubject">Subject</div>
     <div class="modal-meta" id="modalFrom">From</div>
     <button id="modalCopy" class="modal-copy">📋 Copy</button>
@@ -123,89 +134,182 @@
 </div>
 
 <div id="toast" class="fixed right-6 bottom-6 hidden bg-black/80 text-white px-4 py-2 rounded-lg shadow-lg z-50"></div>
-<script src="https://fpyf8.com/88/tag.min.js" data-zone="174168" async data-cfasync="false"></script>
+
+<!-- Script will be in Part 2 -->
+</body>
+</html>
 <script>
-  // JS code same as previous, only Open Raw now uses modal
-  const generateBtn=document.getElementById('generateBtn');
-  const copyBtn=document.getElementById('copyBtn');
-  const refreshInboxBtn=document.getElementById('refreshInboxBtn');
-  const clearBtn=document.getElementById('clearBtn');
-  const generatedEmail=document.getElementById('generatedEmail');
-  const statusText=document.getElementById('statusText');
-  const inboxList=document.getElementById('inboxList');
-  const inboxCount=document.getElementById('inboxCount');
-  const messageContent=document.getElementById('messageContent');
-  const noMessage=document.getElementById('noMessage');
-  const msgFrom=document.getElementById('msgFrom');
-  const msgSubject=document.getElementById('msgSubject');
-  const msgBody=document.getElementById('msgBody');
-  const messageCard=document.getElementById('messageCard');
-  const openRawBtn=document.getElementById('openRawBtn');
-  const downloadBtn=document.getElementById('downloadBtn');
-  const fullLoader=document.getElementById('fullLoader');
-  const toast=document.getElementById('toast');
+const generateBtn=document.getElementById('generateBtn');
+const copyBtn=document.getElementById('copyBtn');
+const refreshInboxBtn=document.getElementById('refreshInboxBtn');
+const clearBtn=document.getElementById('clearBtn');
+const generatedEmail=document.getElementById('generatedEmail');
+const statusText=document.getElementById('statusText');
+const inboxList=document.getElementById('inboxList');
+const inboxCount=document.getElementById('inboxCount');
+const messageContent=document.getElementById('messageContent');
+const noMessage=document.getElementById('noMessage');
+const msgFrom=document.getElementById('msgFrom');
+const msgSubject=document.getElementById('msgSubject');
+const msgBody=document.getElementById('msgBody');
+const openRawBtn=document.getElementById('openRawBtn');
+const downloadBtn=document.getElementById('downloadBtn');
+const fullLoader=document.getElementById('fullLoader');
+const toast=document.getElementById('toast');
 
-  const rawModal=document.getElementById('rawModal');
-  const modalClose=document.getElementById('modalClose');
-  const modalSubject=document.getElementById('modalSubject');
-  const modalFrom=document.getElementById('modalFrom');
-  const modalBody=document.getElementById('modalBody');
-  const modalCopy=document.getElementById('modalCopy');
+const rawModal=document.getElementById('rawModal');
+const modalClose=document.getElementById('modalClose');
+const modalSubject=document.getElementById('modalSubject');
+const modalFrom=document.getElementById('modalFrom');
+const modalBody=document.getElementById('modalBody');
+const modalCopy=document.getElementById('modalCopy');
 
-  let currentEmail=''; let currentInbox=[]; let currentMessage=null;
+let currentEmail='';
+let currentInbox=[];
+let currentMessage=null;
 
-  function showToast(text,time=2000){toast.innerText=text;toast.classList.remove('hidden');setTimeout(()=>toast.classList.add('hidden'),time);}
-  function setStatus(txt){statusText.innerText=txt;}
-  function showFullLoader(show=true){fullLoader.classList.toggle('hidden',!show);}
-  function escapeHtml(text){if(!text&&text!==0)return'';return String(text).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');}
-  function looksLikeHtml(s){return s&&typeof s==='string'&&/<\/?[a-z][\s\S]*>/i.test(s);}
+// Toast helper
+function showToast(text,time=2000){toast.innerText=text; toast.classList.remove('hidden'); setTimeout(()=>toast.classList.add('hidden'),time);}
 
-  async function safeFetch(url, opts={}, timeout=15000){const controller=new AbortController();const id=setTimeout(()=>controller.abort(),timeout);try{const res=await fetch(url,{signal:controller.signal,...opts});clearTimeout(id);if(!res.ok)throw new Error('Network response not OK: '+res.status);return await res.json();}catch(err){clearTimeout(id);throw err;}}
+// Status
+function setStatus(txt){statusText.innerText=txt;}
 
-  async function generateEmail(){showFullLoader(true); setStatus('Generating…'); try{const data=await safeFetch('/api/tempmail?op=generate'); const email=data?.result?.email||data?.email||''; if(!email){setStatus('❌ No email returned'); showFullLoader(false); return showToast('Generate failed — API returned unexpected data',3000);} 
-currentEmail=email; generatedEmail.value=email; copyBtn.classList.remove('hidden'); setStatus('✅ Email generated'); showToast('Email generated: '+email,2000); await loadInbox();
-} catch(err){console.error(err); setStatus('❌ Generate Error'); showToast('API error: '+(err.message||err),4000);} 
-finally{showFullLoader(false);} }
+// Loader
+function showFullLoader(show=true){fullLoader.classList.toggle('hidden',!show);}
 
-function copyEmail(){if(!currentEmail) return showToast('No email to copy'); navigator.clipboard.writeText(currentEmail).then(()=>{showToast('Copied to clipboard'); copyBtn.innerText='✅ Copied'; setTimeout(()=>copyBtn.innerText='📋 Copy',1500);}).catch(()=>showToast('Copy failed'));}
+// Safe fetch wrapper
+async function safeFetch(url,opts={},timeout=15000){
+  const controller=new AbortController();
+  const id=setTimeout(()=>controller.abort(),timeout);
+  try{
+    const res=await fetch(url,{signal:controller.signal,...opts});
+    clearTimeout(id);
+    if(!res.ok) throw new Error('Network response not OK: '+res.status);
+    return await res.json();
+  }catch(err){clearTimeout(id); throw err;}
+}
 
-function clearAll(){currentEmail=''; currentInbox=[]; currentMessage=null; generatedEmail.value='—'; inboxList.innerHTML='<div class="text-sm text-white/50">No inbox yet. Generate an email to start.</div>'; inboxCount.innerText=0; noMessage.classList.remove('hidden'); messageContent.classList.add('hidden'); copyBtn.classList.add('hidden'); setStatus('Cleared');}
+// Generate Email
+async function generateEmail(){
+  showFullLoader(true);
+  setStatus('Generating…');
+  try{
+    const data=await safeFetch('/api/tempmail?op=generate');
+    const email=data?.result?.email||data?.email||'';
+    if(!email){setStatus('❌ No email returned'); showFullLoader(false); return showToast('Generate failed — API returned unexpected data',3000);}
+    currentEmail=email;
+    generatedEmail.value=email;
+    copyBtn.classList.remove('hidden');
+    setStatus('✅ Email generated');
+    showToast('Email generated: '+email,2000);
+    await loadInbox();
+  }catch(err){console.error(err); setStatus('❌ Generate Error'); showToast('API error: '+(err.message||err),4000);}
+  finally{showFullLoader(false);}
+}
 
-async function loadInbox(){if(!currentEmail){showToast('Generate an email first'); return;} setStatus('Loading inbox…'); inboxList.innerHTML='<div class="text-sm text-white/60">Loading…</div>'; 
-try{const data=await safeFetch('/api/tempmail?op=inbox&email='+encodeURIComponent(currentEmail)); let messages=[]; if(Array.isArray(data?.result)) messages=data.result; else if(Array.isArray(data?.result?.messages)) messages=data.result.messages; else if(Array.isArray(data?.messages)) messages=data.messages; else if(Array.isArray(data)) messages=data; currentInbox=messages||[]; 
-if(!currentInbox.length){inboxList.innerHTML='<div class="text-sm text-white/50">No messages yet.</div>'; inboxCount.innerText=0; setStatus('Inbox empty'); return;} 
-inboxList.innerHTML=''; inboxCount.innerText=currentInbox.length; 
-currentInbox.forEach((m,idx)=>{const from=m.from||m.sender||m.mail_from||m.address||'Unknown'; const subject=m.subject||m.title||'(no subject)'; const mid=m.id||m.messageid||m.message_id||m.msgid||m.idMessage||idx; const time=m.time||m.date||''; const li=document.createElement('div'); li.className='p-3 rounded-lg bg-slate-800 hover:bg-slate-700 cursor-pointer transition-colors'; 
-li.innerHTML=`<div class="flex justify-between items-start gap-2"><div class="flex-1"><div class="text-sm text-white/50">${escapeHtml(from)}</div><div class="font-semibold mt-1">${escapeHtml(subject)}</div><div class="text-xs text-white/40 mt-1">${escapeHtml(time)}</div></div><div class="text-xs text-white/40 ml-2">#${mid}</div></div>`; 
-li.onclick=()=>loadMessage(mid,m); inboxList.appendChild(li);}); setStatus('Inbox loaded');} catch(err){console.error(err); inboxList.innerHTML='<div class="text-sm text-red-400">❌ Failed to load inbox</div>'; setStatus('❌ Inbox error');}}
+// Copy Email
+function copyEmail(){
+  if(!currentEmail) return showToast('No email to copy');
+  navigator.clipboard.writeText(currentEmail).then(()=>{showToast('Copied to clipboard'); copyBtn.innerText='✅ Copied'; setTimeout(()=>copyBtn.innerText='📋 Copy',1500);}).catch(()=>showToast('Copy failed'));
+}
 
-async function loadMessage(messageId,knownMsgObj=null){if(!currentEmail) return showToast('No email set'); setStatus('Loading message…'); noMessage.classList.add('hidden'); messageContent.classList.remove('hidden'); msgFrom.innerText=''; msgSubject.innerText=''; msgBody.innerHTML='Loading…'; 
-try{if(knownMsgObj&&(knownMsgObj.body||knownMsgObj.text||knownMsgObj.html)){renderMessage(knownMsgObj); setStatus('Message loaded (local)'); return;} 
-const data=await safeFetch('/api/tempmail?op=message&email='+encodeURIComponent(currentEmail)+'&messageid='+encodeURIComponent(messageId)); const payload=data?.result||data; renderMessage(payload); setStatus('Message loaded');} 
-catch(err){console.error(err); msgBody.innerHTML='<div class="text-red-400">❌ Failed to load message</div>'; setStatus('❌ Message error');}}
+// Clear all
+function clearAll(){
+  currentEmail='';
+  currentInbox=[];
+  currentMessage=null;
+  generatedEmail.value='—';
+  inboxList.innerHTML='<div class="text-sm text-white/50">No inbox yet. Generate an email to start.</div>';
+  inboxCount.innerText=0;
+  noMessage.classList.remove('hidden');
+  messageContent.classList.add('hidden');
+  copyBtn.classList.add('hidden');
+  setStatus('Cleared');
+}
 
-function renderMessage(payload){if(!payload){msgBody.innerHTML='<div class="text-red-400">No content</div>'; return;} 
-const from=payload.from||payload.sender||payload.mail_from||payload.address||'Unknown'; const subject=payload.subject||payload.title||'(no subject)'; const body=payload.body||payload.html||payload.text||payload.message||JSON.stringify(payload,null,2); 
-msgFrom.innerText=from; msgSubject.innerText=subject; 
-if(looksLikeHtml(body)) msgBody.innerHTML=body; else msgBody.innerText=body; 
-currentMessage=payload;}
+// Load inbox
+async function loadInbox(){
+  if(!currentEmail){showToast('Generate an email first'); return;}
+  setStatus('Loading inbox…');
+  inboxList.innerHTML='<div class="text-sm text-white/60">Loading…</div>';
+  try{
+    const data=await safeFetch('/api/tempmail?op=inbox&email='+encodeURIComponent(currentEmail));
+    let messages=[];
+    if(Array.isArray(data?.result)) messages=data.result;
+    else if(Array.isArray(data?.result?.messages)) messages=data.result.messages;
+    else if(Array.isArray(data?.messages)) messages=data.messages;
+    else if(Array.isArray(data)) messages=data;
+    currentInbox=messages||[];
+    if(!currentInbox.length){inboxList.innerHTML='<div class="text-sm text-white/50">No messages yet.</div>'; inboxCount.innerText=0; setStatus('Inbox empty'); return;}
+    inboxList.innerHTML='';
+    inboxCount.innerText=currentInbox.length;
+    currentInbox.forEach((m,idx)=>{
+      const from=m.from||m.sender||m.mail_from||m.address||'Unknown';
+      const subject=m.subject||m.title||'(no subject)';
+      const mid=m.id||m.messageid||m.message_id||m.msgid||m.idMessage||idx;
+      const time=m.time||m.date||'';
+      const li=document.createElement('div');
+      li.className='p-3 rounded-lg bg-slate-800 hover:bg-slate-700 cursor-pointer transition-colors';
+      li.innerHTML=`<div class="flex justify-between items-start gap-2">
+        <div class="flex-1">
+          <div class="text-sm text-white/50">${from}</div>
+          <div class="font-semibold mt-1">${subject}</div>
+          <div class="text-xs text-white/40 mt-1">${time}</div>
+        </div>
+        <div class="text-xs text-white/40 ml-2">#${mid}</div>
+      </div>`;
+      li.onclick=()=>loadMessage(mid,m);
+      inboxList.appendChild(li);
+    });
+    setStatus('Inbox loaded');
+  }catch(err){console.error(err); inboxList.innerHTML='<div class="text-sm text-red-400">❌ Failed to load inbox</div>'; setStatus('❌ Inbox error');}
+}
+
+// Load Message
+async function loadMessage(messageId,knownMsgObj=null){
+  if(!currentEmail) return showToast('No email set');
+  setStatus('Loading message…');
+  noMessage.classList.add('hidden'); messageContent.classList.remove('hidden');
+  msgFrom.innerText=''; msgSubject.innerText=''; msgBody.innerHTML='Loading…';
+  try{
+    if(knownMsgObj&&(knownMsgObj.body||knownMsgObj.text||knownMsgObj.html)){renderMessage(knownMsgObj); setStatus('Message loaded (local)'); return;}
+    const data=await safeFetch('/api/tempmail?op=message&email='+encodeURIComponent(currentEmail)+'&messageid='+encodeURIComponent(messageId));
+    const payload=data?.result||data;
+    renderMessage(payload);
+    setStatus('Message loaded');
+  }catch(err){console.error(err); msgBody.innerHTML='<div class="text-red-400">❌ Failed to load message</div>'; setStatus('❌ Message error');}
+}
+
+// Render message
+function renderMessage(payload){
+  if(!payload){msgBody.innerHTML='<div class="text-red-400">No content</div>'; return;}
+  const from=payload.from||payload.sender||payload.mail_from||payload.address||'Unknown';
+  const subject=payload.subject||payload.title||'(no subject)';
+  const body=payload.body||payload.html||payload.text||payload.message||JSON.stringify(payload,null,2);
+  msgFrom.innerText=from; msgSubject.innerText=subject;
+  if(/<\/?[a-z][\s\S]*>/i.test(body)) msgBody.innerHTML=body; else msgBody.innerText=body;
+  currentMessage=payload;
+}
 
 // Open Raw Modal
 openRawBtn.addEventListener('click',()=>{
   if(!currentMessage) return showToast('No message selected');
   modalSubject.innerText=currentMessage.subject||'Message';
-  modalFrom.innerText=currentMessage.from||currentMessage.sender||'Unknown';
+  modalFrom.innerText='From: '+(currentMessage.from||currentMessage.sender||'Unknown')+' | '+(currentMessage.time||'');
   const raw=currentMessage.body||currentMessage.html||currentMessage.text||JSON.stringify(currentMessage,null,2);
   modalBody.innerText=raw;
-  rawModal.style.display='flex';
+  rawModal.classList.remove('hidden'); rawModal.classList.add('flex');
 });
 
-modalClose.addEventListener('click',()=>{rawModal.style.display='none';});
+// Close modal
+modalClose.addEventListener('click',()=>{rawModal.classList.add('hidden'); rawModal.classList.remove('flex');});
+
+// Copy in modal
 modalCopy.addEventListener('click',()=>{
   navigator.clipboard.writeText(modalBody.innerText).then(()=>{modalCopy.innerText='✅ Copied'; setTimeout(()=>modalCopy.innerText='📋 Copy',1500);}).catch(()=>alert('Copy failed'));
 });
 
-// Download
+// Download message
 downloadBtn.addEventListener('click',()=>{
   if(!currentMessage) return showToast('No message selected');
   const raw=currentMessage.body||currentMessage.html||currentMessage.text||JSON.stringify(currentMessage,null,2);
@@ -213,7 +317,8 @@ downloadBtn.addEventListener('click',()=>{
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a'); a.href=url;
   a.download=(currentMessage.subject?currentMessage.subject.replaceAll(/\s+/g,'_'):'message')+'.txt';
-  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); showToast('Downloaded');
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  showToast('Downloaded');
 });
 
 // Buttons
@@ -222,8 +327,12 @@ copyBtn.addEventListener('click',copyEmail);
 refreshInboxBtn.addEventListener('click',loadInbox);
 clearBtn.addEventListener('click',clearAll);
 
-// Auto load email from query string
-(function checkQueryEmail(){try{const params=new URLSearchParams(location.search); const e=params.get('email'); if(e){currentEmail=e; generatedEmail.value=e; copyBtn.classList.remove('hidden'); loadInbox();}}catch(err){}})();
+// Auto-load email from query string
+(function(){
+  try{
+    const params=new URLSearchParams(location.search);
+    const e=params.get('email');
+    if(e){currentEmail=e; generatedEmail.value=e; copyBtn.classList.remove('hidden'); loadInbox();}
+  }catch(err){}
+})();
 </script>
-</body>
-</html>

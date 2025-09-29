@@ -233,7 +233,8 @@
         const m2 = txt.match(/\b[0-9]{4,12}\b/);
         item.id = m2 ? m2[0] : '';
       }
-      numbersCache.unshift(item); // top
+
+      numbersCache.push(item); // Add to Other numbers (below top 12)
       renderNumbers();
       await refreshOtps();
     } catch(err){ log('Generate error: ' + err.message); }

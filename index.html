@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Temp Mail — Kami Flex</title>
+  <title>⚡ Temp Mail — Kami Flex ⚡</title>
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -24,7 +24,6 @@
       background-clip: text;
       color: transparent;
     }
-    /* large centered loader */
     .center-loader {
       position: fixed;
       inset: 0;
@@ -53,7 +52,7 @@
   <div id="fullLoader" class="center-loader hidden">
     <div class="flex flex-col items-center gap-4">
       <div style="border:4px solid rgba(255,255,255,0.12); border-top:4px solid #a855f7; border-radius:9999px; width:72px; height:72px; animation:spin 1s linear infinite;"></div>
-      <div class="text-white/80">Processing…</div>
+      <div class="text-white/80">Loading…</div>
     </div>
   </div>
 
@@ -63,13 +62,18 @@
     <!-- Header / Hero -->
     <header class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
       <div class="flex items-center gap-4">
+        <button onclick="window.location.href='index.html'" class="px-3 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-white text-sm">
+          ⬅
+        </button>
+
         <div class="w-14 h-14 rounded-xl flex items-center justify-center bg-gradient-to-tr from-pink-500 to-indigo-500 shadow-lg">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="text-white">
             <path d="M3 8.5L12 3l9 5.5V17a2 2 0 0 1-2 2h-3v-5H8v5H5a2 2 0 0 1-2-2V8.5z" fill="white" />
           </svg>
         </div>
+
         <div>
-          <h1 class="text-2xl md:text-3xl font-extrabold neon-text">Temp Mail <span class="text-white/70 font-semibold">by Kami Flex</span></h1>
+          <h1 class="text-2xl md:text-3xl font-extrabold neon-text">⚡ Temp Mail <span class="text-white/70 font-semibold">by Kami Flex ⚡</span></h1>
           <p class="text-sm text-white/60 mt-1">Disposable temp-mail — generate, check inbox and read messages (10 minute expiry)</p>
         </div>
       </div>
@@ -150,7 +154,7 @@
 
     <!-- Footer small -->
     <footer class="mt-8 text-center text-sm text-white/50">
-      🚀 Powered by <span class="text-indigo-300 font-semibold">Kami Flex</span> — Kaami Broken 💔
+      ⚡ Powered by <span class="text-indigo-300 font-semibold">Kami Flex</span> ⚡
     </footer>
   </div>
 
@@ -159,7 +163,6 @@
 
   <!-- Inline script (full features, no external JS file required) -->
   <script>
-    // Elements
     const generateBtn = document.getElementById('generateBtn');
     const copyBtn = document.getElementById('copyBtn');
     const refreshInboxBtn = document.getElementById('refreshInboxBtn');
@@ -179,29 +182,20 @@
     const fullLoader = document.getElementById('fullLoader');
     const toast = document.getElementById('toast');
 
-    // state
     let currentEmail = '';
     let currentInbox = [];
     let currentMessage = null;
 
-    // util: toast
     function showToast(text, time = 2000) {
       toast.innerText = text;
       toast.classList.remove('hidden');
       setTimeout(() => toast.classList.add('hidden'), time);
     }
 
-    // util: set status
-    function setStatus(txt) {
-      statusText.innerText = txt;
-    }
+    function setStatus(txt) { statusText.innerText = txt; }
 
-    // show/hide full loader
-    function showFullLoader(show = true) {
-      fullLoader.classList.toggle('hidden', !show);
-    }
+    function showFullLoader(show = true) { fullLoader.classList.toggle('hidden', !show); }
 
-    // fetch wrapper with timeout
     async function safeFetch(url, opts = {}, timeout = 15000) {
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeout);
@@ -210,52 +204,32 @@
         clearTimeout(id);
         if (!res.ok) throw new Error('Network response not OK: ' + res.status);
         return await res.json();
-      } catch (err) {
-        clearTimeout(id);
-        throw err;
-      }
+      } catch (err) { clearTimeout(id); throw err; }
     }
 
-    // Generate email
     async function generateEmail() {
       showFullLoader(true);
       setStatus('Generating…');
       try {
         const data = await safeFetch('/api/tempmail?op=generate');
         const email = data?.result?.email || data?.email || '';
-        if (!email) {
-          setStatus('❌ No email returned');
-          showFullLoader(false);
-          return showToast('Generate failed — API returned unexpected data', 3000);
-        }
+        if (!email) { setStatus('❌ No email returned'); showFullLoader(false); return showToast('Generate failed — API returned unexpected data', 3000); }
         currentEmail = email;
         generatedEmail.value = email;
         copyBtn.classList.remove('hidden');
         setStatus('✅ Email generated');
         showToast('Email generated: ' + email, 2000);
         await loadInbox();
-      } catch (err) {
-        console.error(err);
-        setStatus('❌ Generate Error');
-        showToast('API error: ' + (err.message || err), 4000);
-      } finally {
-        showFullLoader(false);
-      }
+      } catch (err) { console.error(err); setStatus('❌ Generate Error'); showToast('API error: ' + (err.message || err), 4000); }
+      finally { showFullLoader(false); }
     }
 
-    // Copy email
     function copyEmail() {
       if (!currentEmail) return showToast('No email to copy');
-      navigator.clipboard.writeText(currentEmail).then(() => {
-        showToast('Copied to clipboard');
-        copyBtn.innerText = '✅ Copied';
-        setTimeout(() => copyBtn.innerText = '📋 Copy', 1500);
-      }).catch(() => showToast('Copy failed'));
+      navigator.clipboard.writeText(currentEmail).then(() => { showToast('Copied to clipboard'); copyBtn.innerText = '✅ Copied'; setTimeout(() => copyBtn.innerText = '📋 Copy', 1500); }).catch(() => showToast('Copy failed'));
     }
 
-    // Clear everything
-    function clearAll() {
-      currentEmail = '';
+    function clearAll() {currentEmail = '';
       currentInbox = [];
       currentMessage = null;
       generatedEmail.value = '—';
@@ -267,12 +241,8 @@
       setStatus('Cleared');
     }
 
-    // Load inbox
     async function loadInbox() {
-      if (!currentEmail) {
-        showToast('Generate an email first');
-        return;
-      }
+      if (!currentEmail) return showToast('Generate an email first');
       setStatus('Loading inbox…');
       inboxList.innerHTML = '<div class="text-sm text-white/60">Loading…</div>';
       try {
@@ -282,6 +252,7 @@
         else if (Array.isArray(data?.result?.messages)) messages = data.result.messages;
         else if (Array.isArray(data?.messages)) messages = data.messages;
         else if (Array.isArray(data)) messages = data;
+
         currentInbox = messages || [];
 
         if (!currentInbox.length) {
@@ -320,7 +291,6 @@
       }
     }
 
-    // Load message details
     async function loadMessage(messageId, knownMsgObj = null) {
       if (!currentEmail) return showToast('No email set');
       setStatus('Loading message…');
@@ -332,7 +302,6 @@
           setStatus('Message loaded (local)');
           return;
         }
-
         const data = await safeFetch('/api/tempmail?op=message&email=' + encodeURIComponent(currentEmail) + '&messageid=' + encodeURIComponent(messageId));
         const payload = data?.result || data;
         renderMessage(payload);
@@ -345,35 +314,21 @@
     }
 
     function renderMessage(payload) {
-      if (!payload) {
-        msgBody.innerHTML = '<div class="text-red-400">No content</div>';
-        return;
-      }
+      if (!payload) { msgBody.innerHTML = '<div class="text-red-400">No content</div>'; return; }
       const from = payload.from || payload.sender || payload.mail_from || payload.address || 'Unknown';
       const subject = payload.subject || payload.title || '(no subject)';
       const body = payload.body || payload.html || payload.text || payload.message || JSON.stringify(payload, null, 2);
       msgFrom.innerText = from;
       msgSubject.innerText = subject;
-      if (looksLikeHtml(body)) {
-        msgBody.innerHTML = body;
-      } else {
-        msgBody.innerText = body;
-      }
+      if (looksLikeHtml(body)) msgBody.innerHTML = body;
+      else msgBody.innerText = body;
       currentMessage = payload;
     }
 
-    function looksLikeHtml(s) {
-      if (!s || typeof s !== 'string') return false;
-      return /<\/?[a-z][\s\S]*>/i.test(s);
-    }
+    function looksLikeHtml(s) { return s && typeof s === 'string' && /<\/?[a-z][\s\S]*>/i.test(s); }
     function escapeHtml(text) {
       if (!text && text !== 0) return '';
-      return String(text)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
+      return String(text).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
     }
 
     openRawBtn.addEventListener('click', () => {
@@ -400,24 +355,17 @@
       showToast('Downloaded');
     });
 
-    // Buttons
     generateBtn.addEventListener('click', generateEmail);
     copyBtn.addEventListener('click', copyEmail);
     refreshInboxBtn.addEventListener('click', loadInbox);
     clearBtn.addEventListener('click', clearAll);
 
-    // Auto-check if page loaded with an email in query string ?email=...
     (function checkQueryEmail() {
       try {
         const params = new URLSearchParams(location.search);
         const e = params.get('email');
-        if (e) {
-          currentEmail = e;
-          generatedEmail.value = e;
-          copyBtn.classList.remove('hidden');
-          loadInbox();
-        }
-      } catch (err) { /* ignore */ }
+        if (e) { currentEmail = e; generatedEmail.value = e; copyBtn.classList.remove('hidden'); loadInbox(); }
+      } catch (err) { }
     })();
   </script>
 

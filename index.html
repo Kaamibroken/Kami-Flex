@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kami Flex - Home</title>
+
+  <!-- ✅ Google AdSense Script -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3726211792846627"
+     crossorigin="anonymous"></script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .animated-text {
+      background: linear-gradient(270deg, #7e22ce, #db2777, #f59e0b, #10b981);
+      background-size: 800% 800%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientMove 6s ease infinite;
+      font-family: 'Poppins', sans-serif;
+    }
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200 font-sans text-gray-900 flex flex-col">
+
+  <!-- 🔑 LOGIN SCREEN -->
+  <div id="loginScreen" class="flex flex-col items-center justify-center min-h-screen">
+    <h1 class="text-4xl font-extrabold animated-text mb-6">Kami Flex Access</h1>
+    <div class="bg-white/80 p-6 rounded-2xl shadow-xl w-80 text-center">
+      <input type="password" id="accessKey" placeholder="Enter Access Key"
+             class="w-full p-3 rounded-lg border mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500">
+      <button id="loginBtn" onclick="checkKey()"
+              class="w-full py-3 rounded-lg bg-purple-600 text-white font-bold hover:bg-purple-700 transition">🔑 Login</button>
+      <p id="loading" class="hidden text-sm text-gray-600 mt-3 animate-pulse">Loading...</p>
+      <p id="errorMsg" class="hidden text-red-600 mt-3">❌ Invalid Key</p>
+      <a href="https://t.me/Kami_Flex2" target="_blank"
+         class="mt-5 block px-4 py-2 rounded-lg bg-blue-500 text-white font-semibold">📢 Join Telegram</a>
+    </div>
+  </div>
+
+  <!-- 🌐 HOME PAGE -->
+  <div id="homePage" class="hidden flex flex-col min-h-screen">
+    <!-- NAVBAR -->
+    <header class="backdrop-blur-sm bg-white/30 sticky top-0 z-40">
+      <nav class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-center relative">
+        <div class="flex items-center gap-4">
+          <div class="h-14 w-14 rounded-full bg-gradient-to-tr from-purple-500 via-pink-500 to-yellow-400 flex items-center justify-center shadow-lg">
+            <img src="images/logo.png" alt="Kami Flex Logo" class="h-10 w-10 rounded-full">
+          </div>
+          <h1 class="text-3xl sm:text-4xl font-extrabold animated-text">Kami Flex</h1>
+        </div>
+        <button onclick="toggleMenu()" class="hamburger-btn p-2 rounded-lg bg-white/70 shadow absolute right-6 top-5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </nav>
+    </header>
+
+    <!-- SIDEBAR MENU -->
+    <div id="sidebar" class="fixed top-0 right-0 w-64 h-full bg-gradient-to-br from-purple-200 via-pink-200 to-yellow-200 shadow-2xl transform translate-x-full transition-transform duration-300 z-50">
+      <div class="p-6 flex flex-col gap-4">
+        <div class="flex items-center justify-between border-b pb-4">
+          <p class="font-bold text-lg">Kami Flex</p>
+          <button onclick="toggleMenu()" class="text-gray-600 hover:text-black">✖</button>
+        </div>
+        <a href="tool.html" class="block px-4 py-2 rounded-lg bg-green-500 text-white font-semibold">🛠 Tools</a>
+        <a href="database.html" class="block px-4 py-2 rounded-lg bg-purple-500 text-white font-semibold">📱 Database 2022</a>
+        <a href="https://t.me/Kami_Flex2" target="_blank" class="block px-4 py-2 rounded-lg bg-blue-500 text-white font-semibold">📢 Telegram</a>
+        <div class="mt-auto pt-6 border-t">
+          <button onclick="logout()" class="w-full px-4 py-2 rounded-lg bg-red-500 text-white font-semibold text-left">🚪 Logout</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main id="mainContent" class="flex-grow flex flex-col items-center justify-center text-center px-6 py-16">
+      <h1 class="text-4xl font-extrabold text-gray-900 mb-4">🎉 Welcome to Kami Flex!</h1>
+      <p class="text-lg text-gray-700 max-w-xl mb-8">
+        You have successfully logged in with your access key.
+      </p>
+      <div class="grid gap-6 w-full max-w-lg">
+        <a href="jazztv.html"
+           class="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-pink-500 to-yellow-500 text-white font-bold shadow-lg hover:scale-105 transition transform duration-300">
+          <img src="images/jazz.png" alt="Jazz Free TV Logo" class="h-12 w-12 rounded-full bg-white p-2">
+          <span class="text-xl">📺 Jazz Free TV</span>
+        </a>
+        <a href="zong.html"
+           class="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-green-500 to-blue-500 text-white font-bold shadow-lg hover:scale-105 transition transform duration-300">
+          <img src="images/zong.png" alt="Zong Free TV Logo" class="h-12 w-12 rounded-full bg-white p-2">
+          <span class="text-xl">📺 Zong Free TV</span>
+        </a>
+        <a href="https://app.apponfly.com/trial"
+           class="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-bold shadow-lg hover:scale-105 transition transform duration-300">
+          <img src="images/rdp.png" alt="RDP Logo" class="h-12 w-12 rounded-full bg-white p-2">
+          <span class="text-xl">💻 RDP Trial</span>
+        </a>
+        <a href="database.html"
+   class="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow-lg hover:scale-105 transition transform duration-300">
+  <img src="images/database.png" alt="Database Logo" class="h-12 w-12 rounded-full bg-white p-2">
+  <span class="text-xl">📱 Database 2022</span>
+        </a>
+       <a href="ads.html"
+   class="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold shadow-lg hover:scale-105 transition transform duration-300">
+  <img src="images/zong.png" alt="Zong TV Logo" class="h-12 w-12 rounded-full bg-white p-2">
+  <span class="text-xl">Ads Check ✅</span>      
+       </a>
+<a href="file.html"
+   class="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-teal-400 to-cyan-500 text-white font-bold shadow-lg hover:scale-105 transition transform duration-300">
+  <img src="images/file.png" alt="File Logo" class="h-12 w-12 rounded-full bg-white p-2">
+  <span class="text-xl">Free Internet Files 🗃️</span>
+      </a>
+<a href="temp.html"
+   class="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-purple-400 to-indigo-600 text-white font-bold shadow-lg hover:scale-105 transition transform duration-300">
+  <img src="images/temp.png" alt="Temp Mail Logo" class="h-12 w-12 rounded-full bg-white p-2">
+  <span class="text-xl">⚡ Temp Mail ⚡</span>
+</a>
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="py-6 text-sm opacity-90 text-gray-800 text-center">
+      <div class="font-bold">Kami Flex</div>
+      <div>© 2025 All rights reserved</div>
+    </footer>
+  </div>
+
+  <!-- SCRIPT -->
+  <script>
+    const correctKey = "12345"; // 🔑 Change apni key
+
+    window.onload = function(){
+      if(localStorage.getItem("kamiFlexLogin") === "true"){
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("homePage").classList.remove("hidden");
+      }
+    }
+
+    function checkKey(){
+      const key = document.getElementById("accessKey").value.trim();
+      const errorMsg = document.getElementById("errorMsg");
+      const loading = document.getElementById("loading");
+      const loginBtn = document.getElementById("loginBtn");
+
+      errorMsg.classList.add("hidden");
+
+      if(key === correctKey){
+        loginBtn.disabled = true;
+        loading.classList.remove("hidden");
+        setTimeout(() => {
+          document.getElementById("loginScreen").style.display = "none";
+          document.getElementById("homePage").classList.remove("hidden");
+          localStorage.setItem("kamiFlexLogin", "true");
+        }, 2000);
+      } else {
+        errorMsg.classList.remove("hidden");
+      }
+    }
+
+    function toggleMenu(){
+      const sidebar = document.getElementById("sidebar");
+      sidebar.classList.toggle("translate-x-full");
+    }
+
+    function logout(){
+      localStorage.removeItem("kamiFlexLogin");
+      document.getElementById("homePage").classList.add("hidden");
+      document.getElementById("loginScreen").style.display = "flex";
+      document.getElementById("accessKey").value = "";
+      document.getElementById("loginBtn").disabled = false;
+      document.getElementById("loading").classList.add("hidden");
+      toggleMenu();
+    }
+
+    document.getElementById("mainContent").addEventListener("click", () => {
+      const sidebar = document.getElementById("sidebar");
+      if (!sidebar.classList.contains("translate-x-full")) {
+        sidebar.classList.add("translate-x-full");
+      }
+    });
+  </script>
+</body>
+</html>

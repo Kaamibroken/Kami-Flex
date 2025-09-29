@@ -8,6 +8,9 @@
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- Monetag -->
+  <meta name="monetag" content="b805f1bd7c6023d0341a4d15bd8fe547">
+
   <style>
     /* small custom styles */
     .glass {
@@ -110,7 +113,6 @@
         </div>
 
         <div id="inboxList" class="space-y-3 overflow-auto max-h-[60vh] pr-2">
-          <!-- Inbox items injected here -->
           <div class="text-sm text-white/50">No inbox yet. Generate an email to start.</div>
         </div>
       </section>
@@ -148,7 +150,7 @@
 
     <!-- Footer small -->
     <footer class="mt-8 text-center text-sm text-white/50">
-      🚀 Powered by <span class="text-indigo-300 font-semibold">Kami Flex</span> — using PrinceTech temp-mail API
+      🚀 Powered by <span class="text-indigo-300 font-semibold">Kami Flex</span> — Kaami Broken 💔
     </footer>
   </div>
 
@@ -220,7 +222,6 @@
       setStatus('Generating…');
       try {
         const data = await safeFetch('/api/tempmail?op=generate');
-        // API returns { result: { email: '...' } }
         const email = data?.result?.email || data?.email || '';
         if (!email) {
           setStatus('❌ No email returned');
@@ -232,7 +233,6 @@
         copyBtn.classList.remove('hidden');
         setStatus('✅ Email generated');
         showToast('Email generated: ' + email, 2000);
-        // auto load inbox
         await loadInbox();
       } catch (err) {
         console.error(err);
@@ -277,16 +277,13 @@
       inboxList.innerHTML = '<div class="text-sm text-white/60">Loading…</div>';
       try {
         const data = await safeFetch('/api/tempmail?op=inbox&email=' + encodeURIComponent(currentEmail));
-        // Try common shapes: data.result might be array, or data.result.messages etc.
         let messages = [];
         if (Array.isArray(data?.result)) messages = data.result;
         else if (Array.isArray(data?.result?.messages)) messages = data.result.messages;
         else if (Array.isArray(data?.messages)) messages = data.messages;
         else if (Array.isArray(data)) messages = data;
-        // else empty
         currentInbox = messages || [];
 
-        // display
         if (!currentInbox.length) {
           inboxList.innerHTML = '<div class="text-sm text-white/50">No messages yet.</div>';
           inboxCount.innerText = 0;
@@ -296,7 +293,6 @@
         inboxList.innerHTML = '';
         inboxCount.innerText = currentInbox.length;
         currentInbox.forEach((m, idx) => {
-          // determine meaningful fields
           const from = m.from || m.sender || m.mail_from || m.address || 'Unknown';
           const subject = m.subject || m.title || m.heading || '(no subject)';
           const mid = m.id || m.messageid || m.message_id || m.msgid || m.idMessage || idx;
@@ -324,14 +320,13 @@
       }
     }
 
-    // Load message details by messageid (if available). We also allow passing pre-known message object to render faster.
+    // Load message details
     async function loadMessage(messageId, knownMsgObj = null) {
       if (!currentEmail) return showToast('No email set');
       setStatus('Loading message…');
       noMessage.classList.add('hidden'); messageContent.classList.remove('hidden');
       msgFrom.innerText = ''; msgSubject.innerText = ''; msgBody.innerHTML = 'Loading…';
       try {
-        // If we have a known object that already contains body, use it
         if (knownMsgObj && (knownMsgObj.body || knownMsgObj.text || knownMsgObj.html)) {
           renderMessage(knownMsgObj);
           setStatus('Message loaded (local)');
@@ -349,7 +344,6 @@
       }
     }
 
-    // Render message payload (try many fields)
     function renderMessage(payload) {
       if (!payload) {
         msgBody.innerHTML = '<div class="text-red-400">No content</div>';
@@ -357,11 +351,9 @@
       }
       const from = payload.from || payload.sender || payload.mail_from || payload.address || 'Unknown';
       const subject = payload.subject || payload.title || '(no subject)';
-      // message body could be in many fields
       const body = payload.body || payload.html || payload.text || payload.message || JSON.stringify(payload, null, 2);
       msgFrom.innerText = from;
       msgSubject.innerText = subject;
-      // if html-like content, insert as HTML, else escape
       if (looksLikeHtml(body)) {
         msgBody.innerHTML = body;
       } else {
@@ -370,7 +362,6 @@
       currentMessage = payload;
     }
 
-    // helpers
     function looksLikeHtml(s) {
       if (!s || typeof s !== 'string') return false;
       return /<\/?[a-z][\s\S]*>/i.test(s);
@@ -385,7 +376,6 @@
         .replaceAll("'", '&#039;');
     }
 
-    // open raw message (new tab)
     openRawBtn.addEventListener('click', () => {
       if (!currentMessage) return showToast('No message selected');
       const raw = currentMessage.body || currentMessage.html || currentMessage.text || JSON.stringify(currentMessage, null, 2);
@@ -395,7 +385,6 @@
       w.document.close();
     });
 
-    // download message as .txt
     downloadBtn.addEventListener('click', () => {
       if (!currentMessage) return showToast('No message selected');
       const raw = currentMessage.body || currentMessage.html || currentMessage.text || JSON.stringify(currentMessage, null, 2);
@@ -431,5 +420,8 @@
       } catch (err) { /* ignore */ }
     })();
   </script>
+
+  <!-- Monetag script -->
+  <script src="https://fpyf8.com/88/tag.min.js" data-zone="174168" async data-cfasync="false"></script>
 </body>
 </html>

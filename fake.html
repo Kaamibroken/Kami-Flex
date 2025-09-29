@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🔰 Kami Flex Fake Number 🔰</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-1:#041427; --bg-2:#071a2a; --card:rgba(255,255,255,0.03);
+  --muted:#8fa3b2; --accent1:#19c2ff; --accent2:#1fb6ff;
+  --green:#7ef05d; --glass:rgba(255,255,255,0.02);
+}
+html,body{height:100%;margin:0;background:radial-gradient(circle at 20% 10%, rgba(255,255,255,0.02), transparent 10%), linear-gradient(180deg,var(--bg-1),var(--bg-2));font-family:Inter,system-ui,Arial;color:#e6f3fb}
+.wrap{max-width:980px;margin:20px auto;padding:18px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(90deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#022;font-size:28px}
+h1{margin:0;font-size:28px}
+.controls{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 6px 18px rgba(3,8,18,0.5);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+select,input{background:transparent;border-radius:10px;padding:10px;border:1px solid rgba(255,255,255,0.04);color:inherit;min-width:160px}
+.btn{padding:10px 18px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#012;cursor:pointer;position:relative}
+.btn.loading::after{
+  content:'';
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:18px; height:18px; border:2px solid #012; border-top-color:var(--accent2); border-radius:50%;
+  animation:spin 0.8s linear infinite;
+}
+@keyframes spin{from{transform:translate(-50%,-50%) rotate(0deg);}to{transform:translate(-50%,-50%) rotate(360deg);}}
+.card{background:var(--glass);margin-top:16px;border-radius:14px;padding:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.02)}
+.list-head{display:grid;grid-template-columns:1fr 1fr 140px;gap:12px;padding:12px 6px;border-bottom:1px dashed rgba(255,255,255,0.03);align-items:center;color:var(--muted);font-size:13px}
+.rows{display:grid;gap:10px;padding:12px 6px;max-height:480px;overflow:auto}
+.row{display:grid;grid-template-columns:1fr 1fr 140px;gap:12px;align-items:center;padding:14px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border-radius:10px}
+.number{font-weight:700;font-size:15px}
+.otp{color:var(--green);font-weight:700;margin-top:6px;font-size:14px}
+.country{display:flex;flex-direction:column}
+.country .name{font-weight:600}
+.country .carrier{color:var(--accent2);margin-top:6px}
+.time{color:var(--accent2);font-weight:600;text-align:right}
+.small-muted{color:var(--muted);font-size:13px}
+.pagination{display:flex;gap:8px;align-items:center;justify-content:center;padding:14px;color:var(--muted)}
+textarea#log{width:100%;height:120px;border-radius:10px;background:#02101a;color:#9fdbe8;border:0;padding:10px;resize:vertical;margin-top:12px}
+.moon{position:fixed;left:50%;transform:translateX(-50%);bottom:220px;width:260px;height:260px;background:radial-gradient(circle at 30% 30%, #aab7c6, #1c2b37);opacity:0.08;border-radius:50%;pointer-events:none}
+@media(max-width:860px){ .list-head, .row{grid-template-columns: 1fr 1fr 110px} .time{text-align:left}}
+@media(max-width:560px){ .list-head, .row{grid-template-columns: 1fr; } .time{text-align:left; margin-top:8px} .country{margin-top:6px} }
+</style>
+</head>
+<body>
+<div class="moon"></div>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="logo">O</div>
+      <div>
+        <h1>🔰 Kami Flex Fake Number 🔰</h1>
+        <div class="small-muted">Full country name • carrier from API • OTP under number</div>
+      </div>
+    </div>
+    <div class="controls">
+      <select id="countrySelect"><option>Loading countries...</option></select>
+      <select id="carrierSelect"><option>Loading carriers...</option></select>
+      <button id="getBtn" class="btn">✈ Get Number</button>
+      <button id="generateBtn" class="btn">＋ Generate</button>
+    </div>
+  </header>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3 style="margin:0">Numbers</h3>
+      <div class="small-muted" id="recordsInfo">Showing 0 records</div>
+    </div>
+    <div class="list-head">
+      <div>Phone</div>
+      <div>Country / Carrier</div>
+      <div style="text-align:right">Time</div>
+    </div>
+    <div class="rows" id="rows"></div>
+    <div class="pagination" id="pagination">1 ‹ 2 › 6</div>
+  </div>
+  <textarea id="log" readonly placeholder="Logs & raw responses"></textarea>
+</div>
+
+<script>
+const rowsEl = document.getElementById('rows');
+const logEl = document.getElementById('log');
+const countrySelect = document.getElementById('countrySelect');
+const carrierSelect = document.getElementById('carrierSelect');
+const recordsInfo = document.getElementById('recordsInfo');
+let records = [];
+
+// --- Helpers ---
+function logMsg(msg){ const ts=new Date().toLocaleString(); logEl.value=`[${ts}] ${msg}\n\n`+logEl.value; }
+function timeAgo(iso){ const d=new Date(iso); const s=Math.floor((Date.now()-d)/1000); if(s<60) return `${s}s ago`; if(s<3600) return `${Math.floor(s/60)}m ago`; if(s<86400) return `${Math.floor(s/3600)}h ago`; return `${Math.floor(s/86400)}d ago`; }
+function render(){
+  rowsEl.innerHTML='';
+  records.forEach(item=>{
+    const r=document.createElement('div'); r.className='row';
+    const left=document.createElement('div'); left.innerHTML=`<div class="number">${item.number}</div><div class="otp">${item.otp||''}</div>`;
+    const mid=document.createElement('div'); mid.innerHTML=`<div class="country"><div class="name">${item.country}</div><div class="carrier">${item.carrier}</div></div>`;
+    const right=document.createElement('div'); right.className='time'; right.innerHTML=`<div>${timeAgo(item.created)}</div>`;
+    r.append(left,mid,right); rowsEl.appendChild(r);
+  });
+  recordsInfo.textContent=`Showing ${records.length} records`;
+}
+
+// --- Load countries and carriers from API ---
+async function loadFilters(){
+  try{
+    const countryRes = await fetch('/api/countries');
+    const countries = await countryRes.json();
+    countrySelect.innerHTML='<option value="">Any country</option>';
+    countries.forEach(c=>{ const opt=document.createElement('option'); opt.value=c.code; opt.textContent=c.name; countrySelect.appendChild(opt); });
+
+    const carrierRes = await fetch('/api/carriers');
+    const carriers = await carrierRes.json();
+    carrierSelect.innerHTML='<option value="">Any carrier</option>';
+    carriers.forEach(c=>{ const opt=document.createElement('option'); opt.value=c; opt.textContent=c; carrierSelect.appendChild(opt); });
+    logMsg('Filters loaded from API');
+  }catch(e){ logMsg('Error loading filters: '+e.message); }
+}
+
+// --- Fetch numbers from API ---
+async function fetchNumbers(count=1){
+  const btn = document.getElementById('getBtn');
+  btn.classList.add('loading');
+  const country = countrySelect.value;
+  const carrier = carrierSelect.value;
+  const url = `/api/fake-sms?count=${count}&country=${country}&carrier=${carrier}`;
+  try{
+    const res = await fetch(url);
+    const data = await res.json();
+    data.forEach(item=>records.push(item));
+    render();
+    logMsg(`Fetched ${data.length} records from API`);
+  }catch(e){ logMsg('Fetch error: '+e.message); }
+  finally{ btn.classList.remove('loading'); }
+}
+
+async function generateOne(){
+  await fetchNumbers(1);
+}
+
+loadFilters();
+fetchNumbers(12);
+
+document.getElementById('getBtn').addEventListener('click',()=>fetchNumbers(12));
+document.getElementById('generateBtn').addEventListener('click',generateOne);
+</script>
+</body>
+</html>

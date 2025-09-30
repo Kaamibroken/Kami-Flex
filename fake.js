@@ -1,20 +1,25 @@
-// CommonJS style
-const fetch = require('node-fetch'); // require instead of import
+// fake.js
+const fetch = require('node-fetch');
 
 const AUTH_TOKEN = 'f5f67281-417e-4925-b74b-e86de2eee205';
 
-async function handler(type, app, carrier){
+async function main() {
+  const type = 'number'; // test 'number' or 'otp'
+  const app = 'global--AF-93';
+  const carrier = '619';
+
   const headers = {
     'auth-token': AUTH_TOKEN,
-    'X-Requested-With':'XMLHttpRequest',
-    'User-Agent':'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/140 Mobile Safari/537.36',
-    'Accept':'application/json, text/javascript, */*; q=0.01',
-    'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8',
+    'X-Requested-With': 'XMLHttpRequest',
+    'User-Agent': 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36',
+    'Accept': 'application/json, text/javascript, */*; q=0.01',
+    'Content-Type': 'application/x-www-form-urlencoded',
   };
 
-  try{
+  try {
     let response;
-    if(type === 'otp'){
+
+    if (type === 'otp') {
       const form = new URLSearchParams();
       form.append('page_no','1');
       form.append('filter[0][name]','filter_status');
@@ -26,35 +31,31 @@ async function handler(type, app, carrier){
       form.append('filter[3][name]','countries');
       form.append('filter[3][value]','0');
       form.append('search','');
-      response = await fetch('https://raazit.acchub.io/api/', {method:'POST', headers, body:form.toString()});
-    } else if(type==='number'){
-      if(!app||!carrier) throw new Error('app & carrier required');
+
+      response = await fetch('https://raazit.acchub.io/api/', {
+        method: 'POST',
+        headers,
+        body: form.toString()
+      });
+
+    } else if (type === 'number') {
       const form = new URLSearchParams();
       form.append('app', app);
       form.append('carrier', carrier);
-      response = await fetch('https://raazit.acchub.io/api/sms/', {method:'POST', headers, body:form.toString()});
-    } else {
-      throw new Error('Invalid type');
+
+      response = await fetch('https://raazit.acchub.io/api/sms/', {
+        method: 'POST',
+        headers,
+        body: form.toString()
+      });
     }
 
     const text = await response.text();
-    try{
-      return JSON.parse(text);
-    }catch{
-      return text;
-    }
+    console.log('Response:', text);
 
-  }catch(err){
-    console.error('Upstream error:',err);
-    return {error:'Upstream failed', detail:err.message};
+  } catch (err) {
+    console.error('Error:', err.message);
   }
 }
 
-// Test example in Termux
-(async()=>{
-  const number = await handler('number','global--AF-93','619');
-  console.log('Number result:', number);
-
-  const otp = await handler('otp');
-  console.log('OTP result:', otp);
-})();
+main();

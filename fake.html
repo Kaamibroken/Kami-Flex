@@ -1,363 +1,126 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🔰 Kami Flex Fake Number 🔰</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-
 <style>
-  :root{
-    --bg1:#7f5af0; --bg2:#2cb67d; --bg3:#00c6ff; --bg4:#ff5f6d;
-    --glass: rgba(255,255,255,0.08);
-    --muted:#cde9f6;
-    --accent1:#19c2ff; --accent2:#1fb6ff; --green:#7ef05d;
+  body {background:#041427;color:#e6f3fb;font-family:sans-serif;padding:20px;}
+  h1 {font-size:28px;margin-bottom:20px;}
+  select,input,button {padding:10px;margin:5px;border-radius:8px;border:none;}
+  select,input {min-width:180px;}
+  button {cursor:pointer;background:#1fb6ff;color:#012;font-weight:bold;position:relative;}
+  button.loading::after{
+    content:'';
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:18px; height:18px; border:2px solid #012; border-top-color:#19c2ff;
+    border-radius:50%; animation:spin 0.8s linear infinite;
   }
-  html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial;background:linear-gradient(270deg,var(--bg1),var(--bg2),var(--bg3),var(--bg4));background-size:800% 800%;animation:shift 16s linear infinite;color:white}
-  @keyframes shift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-  .panel{backdrop-filter: blur(10px); background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:18px; box-shadow: 0 10px 40px rgba(2,6,23,0.45);}
-  .logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(90deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#012;font-size:28px}
-  .kami-title{ text-shadow:0 0 16px rgba(127,90,240,0.7), 0 0 32px rgba(44,182,125,0.5); }
-  .btn{background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#012; font-weight:700; padding:10px 16px; border-radius:12px; border:0; cursor:pointer;}
-  .btn:disabled{opacity:0.6;cursor:not-allowed}
-  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06); padding:8px 12px;border-radius:10px}
-  .spinner{border:4px solid rgba(255,255,255,0.2); border-top-color:#fff;border-radius:50%;width:36px;height:36px;animation:spin 1s linear infinite;margin:0 auto}
-  @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
-  .btn-loader{width:18px;height:18px;border:2px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;display:inline-block;vertical-align:middle}
-  .card {background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); padding:14px; border-radius:12px; border:1px solid rgba(255,255,255,0.03);}
-  .otp { color:var(--green); font-weight:800; margin-top:6px; display:block; }
-  .muted { color:rgba(255,255,255,0.7); font-size:13px; }
-  .error { background: rgba(255,90,90,0.08); color:#ffb4b4; padding:10px;border-radius:10px; margin-bottom:12px; border:1px solid rgba(255,90,90,0.12) }
-  .small { font-size:13px; color:rgba(255,255,255,0.85) }
-  .copy-btn{background:rgba(0,0,0,0.25); padding:6px 10px;border-radius:8px;color:white;border:1px solid rgba(255,255,255,0.04)}
-  @media (max-width:720px){ .layout-grid{grid-template-columns:1fr; gap:14px} .controls-row{flex-direction:column;align-items:stretch} }
+  @keyframes spin{0%{transform:translate(-50%,-50%) rotate(0deg);}100%{transform:translate(-50%,-50%) rotate(360deg);}}
+  .row {padding:10px;margin:8px 0;border-radius:10px;background:rgba(255,255,255,0.05);}
+  .number {font-weight:bold;}
+  .otp {color:#7ef05d;font-weight:bold;}
+  .country {color:#1fb6ff;}
+  .error {color:#ff4d4f;font-weight:bold;margin-top:10px;}
 </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-6">
+<body>
 
-<!-- Container -->
-<div class="w-full max-w-4xl layout-grid grid grid-cols-[380px_1fr] gap-8">
+<h1>🔰 Kami Flex Fake Number 🔰</h1>
 
-  <!-- Left: Login / Controls -->
-  <div class="panel p-6">
-    <div class="flex items-center gap-4 mb-4">
-      <div class="logo">O</div>
-      <div>
-        <h1 class="kami-title text-2xl font-extrabold">🔰 Kami Flex Fake Number</h1>
-        <div class="muted">Full country name • carrier from API • OTP under number</div>
-      </div>
-    </div>
+<select id="countrySelect"><option>Loading countries...</option></select>
+<select id="carrierSelect"><option>Loading carriers...</option></select>
+<button id="getBtn">Get Number</button>
+<button id="generateBtn">Generate</button>
 
-    <!-- Error area -->
-    <div id="apiError" class="error hidden">API error</div>
-
-    <!-- Filters -->
-    <div class="card mb-4">
-      <div class="small mb-2">Select country</div>
-      <select id="countrySel" class="w-full p-3 rounded-lg bg-transparent border border-white/10 text-white">
-        <option value="">Loading countries...</option>
-      </select>
-
-      <div class="small mb-2 mt-3">Select carrier</div>
-      <select id="carrierSel" class="w-full p-3 rounded-lg bg-transparent border border-white/10 text-white">
-        <option value="">Loading carriers...</option>
-      </select>
-
-      <div class="flex gap-3 mt-4 controls-row">
-        <button id="getBtn" class="btn flex items-center gap-3">
-          <span id="getLabel">✈ Get Number</span>
-          <span id="getSpinner" class="btn-loader hidden"></span>
-        </button>
-        <button id="generateBtn" class="btn">＋ Generate</button>
-        <button id="clearBtn" class="btn-ghost ml-auto">Clear</button>
-      </div>
-
-      <div class="mt-3 small muted">Tip: Use country dropdown to filter carriers (if API supports it)</div>
-    </div>
-
-    <!-- Logs -->
-    <div class="card">
-      <div class="small mb-2">Logs</div>
-      <textarea id="log" readonly style="width:100%;height:160px;background:transparent;border:0;color:rgba(255,255,255,0.9);resize:none"> </textarea>
-    </div>
-  </div>
-
-  <!-- Right: Results -->
-  <div class="panel p-6">
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-xl font-bold">Numbers</h2>
-      <div class="muted" id="countInfo">Showing 0 records</div>
-    </div>
-
-    <!-- Loading overlay -->
-    <div id="overlay" class="hidden absolute inset-0 z-50 flex items-center justify-center">
-      <div class="w-full max-w-sm text-center">
-        <div class="spinner"></div>
-        <div class="mt-3 small">Contacting API<span class="ml-2">...</span></div>
-      </div>
-    </div>
-
-    <div id="rows" class="grid gap-3"></div>
-
-    <div id="noData" class="mt-6 muted text-center">No numbers yet. Click <strong>Get Number</strong></div>
-  </div>
-</div>
+<div id="rows"></div>
+<div id="errorMsg" class="error"></div>
 
 <script>
-/*
-  Frontend for Kami Flex Fake Number
-  Calls: /api/fake.js?op=countries
-         /api/fake.js?op=carriers&country=CODE
-         /api/fake.js?op=get&count=12&country=CODE&carrier=NAME
-         /api/fake.js?op=generate&country=CODE&carrier=NAME
-  Shows loader only while requests active; displays error if API not reachable or returns non-OK.
-*/
-
-const countrySel = document.getElementById('countrySel');
-const carrierSel = document.getElementById('carrierSel');
+const countrySelect = document.getElementById('countrySelect');
+const carrierSelect = document.getElementById('carrierSelect');
 const getBtn = document.getElementById('getBtn');
 const generateBtn = document.getElementById('generateBtn');
-const clearBtn = document.getElementById('clearBtn');
-const getSpinner = document.getElementById('getSpinner');
-const apiError = document.getElementById('apiError');
 const rowsEl = document.getElementById('rows');
-const overlay = document.getElementById('overlay');
-const logEl = document.getElementById('log');
-const countInfo = document.getElementById('countInfo');
-const noData = document.getElementById('noData');
+const errorMsg = document.getElementById('errorMsg');
 
-let records = [];
-let fetching = false;
-
-function logMsg(msg){
-  const ts = new Date().toLocaleString();
-  logEl.value = `[${ts}] ${msg}\n` + logEl.value;
-}
-
-// show error nicely
-function showApiError(text){
-  apiError.textContent = text;
-  apiError.classList.remove('hidden');
-  setTimeout(()=> apiError.classList.add('hidden'), 7000);
-}
-
-// helpers for loader
-function startLoading(btnOnly=false){
-  fetching = true;
-  getSpinner.classList.remove('hidden');
-  if(!btnOnly){
-    overlay.classList.remove('hidden');
-  }
-  getBtn.disabled = true;
-  generateBtn.disabled = true;
-}
-function stopLoading(){
-  fetching = false;
-  getSpinner.classList.add('hidden');
-  overlay.classList.add('hidden');
-  getBtn.disabled = false;
-  generateBtn.disabled = false;
-}
-
-// render rows
-function render(){
-  rowsEl.innerHTML = '';
-  if(records.length === 0){
-    noData.classList.remove('hidden');
-  } else {
-    noData.classList.add('hidden');
-  }
-  records.forEach((r, idx) => {
-    const card = document.createElement('div');
-    card.className = 'card flex items-start gap-4';
-    card.innerHTML = `
-      <div style="min-width:110px">
-        <div class="small">Phone</div>
-        <div class="text-lg font-bold">${escapeHtml(r.number||'(no)')}</div>
-        <div class="otp">${escapeHtml(r.otp||'')}</div>
-      </div>
-      <div class="flex-1">
-        <div class="small">Country / Carrier</div>
-        <div class="font-semibold">${escapeHtml(r.country||'Unknown')} • <span class="muted">${escapeHtml(r.carrier||'global')}</span></div>
-        <div class="mt-2 small">Created: ${escapeHtml((new Date(r.created||Date.now())).toLocaleString())}</div>
-      </div>
-      <div class="flex flex-col items-end gap-2">
-        <button class="copy-btn" data-idx="${idx}">Copy</button>
-        <button class="btn-ghost" data-idx="${idx}" title="Remove">Remove</button>
-      </div>
-    `;
-    rowsEl.appendChild(card);
-  });
-  countInfo.textContent = `Showing ${records.length} records`;
-  // attach copy/remove handlers
-  rowsEl.querySelectorAll('.copy-btn').forEach(btn=>{
-    btn.addEventListener('click', async (e)=>{
-      const i = Number(btn.dataset.idx);
-      const t = records[i];
-      try{
-        await navigator.clipboard.writeText(`Number: ${t.number}\nOTP: ${t.otp}\nCountry: ${t.country}\nCarrier: ${t.carrier}`);
-        btn.textContent = '✅ Copied';
-        setTimeout(()=> btn.textContent = 'Copy', 1500);
-      }catch(err){
-        showApiError('Clipboard denied');
-      }
-    });
-  });
-  rowsEl.querySelectorAll('.btn-ghost').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const i = Number(btn.dataset.idx);
-      records.splice(i,1);
-      render();
-      logMsg('Removed record at index '+i);
-    });
-  });
-}
-function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-// API wrapper that handles errors and shows nice messages when API is down
-async function apiFetch(query, {showOverlay=true} = {}){
-  if(fetching && showOverlay) startLoading();
+// --- Load countries from API ---
+async function loadCountries() {
   try {
-    const res = await fetch(`/api/fake.js?${query}`, { cache: 'no-store' });
-    if(!res.ok){
-      const text = await res.text().catch(()=>res.statusText || 'Unknown error');
-      throw new Error(`API ${res.status} - ${text}`);
-    }
+    const res = await fetch('/api/fake.js?type=countries');
+    if(!res.ok) throw new Error(`API ${res.status} - ${res.statusText}`);
     const data = await res.json();
-    return data;
-  } catch (err) {
-    showApiError('API error: ' + err.message);
-    logMsg('API error: ' + err.message);
-    throw err;
-  } finally {
-    if(showOverlay) stopLoading();
+    countrySelect.innerHTML = '';
+    data.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.code; // API code
+      opt.textContent = c.name; // full country name
+      countrySelect.appendChild(opt);
+    });
+  } catch(e) {
+    countrySelect.innerHTML = '<option>Error loading countries</option>';
+    errorMsg.textContent = 'Error loading countries: ' + e.message;
   }
 }
 
-// load countries and initial carriers
-async function loadFilters(){
-  try{
-    startLoading(true); // button loader only while fetching filters
-    const data = await apiFetch('op=countries', { showOverlay: false });
-    if(Array.isArray(data) && data.length){
-      countrySel.innerHTML = '<option value="">Any country</option>';
-      data.forEach(c=>{
-        const o = document.createElement('option');
-        o.value = c.code || c.code?.toUpperCase?.() || c.code;
-        o.textContent = c.name || c.country || c.code;
-        countrySel.appendChild(o);
-      });
-      logMsg('Loaded countries: ' + data.length);
-    } else {
-      throw new Error('Invalid countries response');
-    }
-  } catch(e){
-    countrySel.innerHTML = '<option value="">(failed to load)</option>';
-  } finally {
-    stopLoading();
-  }
-
-  // load carriers (initial)
-  await loadCarriers();
-}
-
-// load carriers optionally by country
-async function loadCarriers(countryCode = ''){
-  try{
-    startLoading(true);
-    const q = countryCode ? `op=carriers&country=${encodeURIComponent(countryCode)}` : 'op=carriers';
-    const data = await apiFetch(q, { showOverlay: false });
-    if(Array.isArray(data)){
-      carrierSel.innerHTML = '<option value="">Any carrier</option>';
-      data.forEach(c=>{
-        const o = document.createElement('option');
-        o.value = c;
-        o.textContent = c;
-        carrierSel.appendChild(o);
-      });
-      logMsg('Loaded carriers: ' + data.length + (countryCode ? (' for ' + countryCode) : ''));
-    } else {
-      throw new Error('Invalid carriers response');
-    }
-  } catch(e){
-    carrierSel.innerHTML = '<option value="">(failed to load)</option>';
-  } finally {
-    stopLoading();
+// --- Load carriers from API ---
+async function loadCarriers() {
+  try {
+    const res = await fetch('/api/fake.js?type=carriers');
+    if(!res.ok) throw new Error(`API ${res.status} - ${res.statusText}`);
+    const data = await res.json();
+    carrierSelect.innerHTML = '';
+    data.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c;
+      opt.textContent = c;
+      carrierSelect.appendChild(opt);
+    });
+  } catch(e) {
+    carrierSelect.innerHTML = '<option>Error loading carriers</option>';
+    errorMsg.textContent = 'Error loading carriers: ' + e.message;
   }
 }
 
-// fetch batch of numbers
-async function getNumbers(count = 12){
-  if(fetching) return;
-  const country = countrySel.value || '';
-  const carrier = carrierSel.value || '';
-  try{
-    startLoading();
-    const q = `op=get&count=${encodeURIComponent(count)}&country=${encodeURIComponent(country)}&carrier=${encodeURIComponent(carrier)}`;
-    const data = await apiFetch(q);
-    if(Array.isArray(data)){
-      data.forEach(item => records.unshift(item));
-      render();
-      logMsg(`Fetched ${data.length} numbers`);
-    } else {
-      throw new Error('Invalid data from get');
-    }
-  } catch(err){
-    // error already handled in apiFetch
+// --- Fetch number ---
+async function fetchNumber() {
+  errorMsg.textContent = '';
+  const country = countrySelect.value;
+  const carrier = carrierSelect.value;
+  getBtn.classList.add('loading');
+  generateBtn.classList.add('loading');
+  try {
+    const res = await fetch(`/api/fake.js?type=number&app=global--${country}-01&carrier=${carrier}`);
+    if(!res.ok) throw new Error(`API ${res.status} - ${res.statusText}`);
+    const data = await res.json();
+    const number = data.number || 'N/A';
+    const otp = data.otp || Math.floor(1000 + Math.random()*9000);
+    const countryName = countrySelect.options[countrySelect.selectedIndex].text;
+    renderRow({number, otp, country: countryName, carrier});
+  } catch(e) {
+    errorMsg.textContent = 'Error fetching number: ' + e.message;
   } finally {
-    stopLoading();
+    getBtn.classList.remove('loading');
+    generateBtn.classList.remove('loading');
   }
 }
 
-// generate single number
-async function generateOne(){
-  if(fetching) return;
-  const country = countrySel.value || '';
-  const carrier = carrierSel.value || '';
-  try{
-    startLoading();
-    const q = `op=generate&country=${encodeURIComponent(country)}&carrier=${encodeURIComponent(carrier)}`;
-    const data = await apiFetch(q);
-    if(data && (data.number || data.otp || data.country)){
-      records.unshift(data);
-      render();
-      logMsg('Generated 1 number');
-    } else {
-      throw new Error('Invalid data from generate');
-    }
-  } catch(err){
-    // handled above
-  } finally {
-    stopLoading();
-  }
+// --- Render row ---
+function renderRow(item){
+  const div = document.createElement('div'); div.className='row';
+  div.innerHTML = `<div class="number">${item.number}</div>
+                   <div class="otp">${item.otp}</div>
+                   <div class="country">${item.country} / ${item.carrier}</div>`;
+  rowsEl.prepend(div);
 }
 
-// clear records
-clearBtn.addEventListener('click', ()=>{
-  records = [];
-  render();
-  logMsg('Cleared records');
-});
+// --- Event listeners ---
+getBtn.addEventListener('click', fetchNumber);
+generateBtn.addEventListener('click', fetchNumber);
 
-// when country changes, reload carriers for that country (if API supports it)
-countrySel.addEventListener('change', ()=>{
-  loadCarriers(countrySel.value);
-});
-
-// init
-(async function init(){
-  try{
-    await loadFilters();
-    // preload a batch (non-blocking)
-    try { await getNumbers(6); } catch(e){ /* ignore */ }
-  } catch(e){}
-})();
-
-// attach buttons
-getBtn.addEventListener('click', ()=>getNumbers(12));
-generateBtn.addEventListener('click', ()=>generateOne());
+// --- Initial load ---
+loadCountries();
+loadCarriers();
 
 </script>
 </body>

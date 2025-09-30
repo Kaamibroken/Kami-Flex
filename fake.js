@@ -1,16 +1,17 @@
 // api/fake.js
-// Vercel serverless function that proxies the Raazit endpoints you provided.
-// Filename: api/fake.js  (this matches your "fake" name request for the JS file)
-
 import fetch from 'node-fetch';
 
 const AUTH_TOKEN = process.env.RAAZIT_AUTH_TOKEN || 'f5f67281-417e-4925-b74b-e86de2eee205';
 
+// Helper to build a Raazit app ID based on country code
+function buildAppId(countryCode) {
+  if (!countryCode) return `global--AF-${Math.floor(10 + Math.random() * 90)}`;
+  return `global--${countryCode}-${Math.floor(10 + Math.random() * 90)}`;
+}
+
 export default async function handler(req, res) {
   const method = (req.method || 'GET').toUpperCase();
-  const { type } = req.query || req.body || {};
-  const app = req.query.app || (req.body && req.body.app) || 'global--AF-93';
-  const carrier = req.query.carrier || (req.body && req.body.carrier) || '619';
+  const { type, app, carrier, country } = req.query || {};
 
   const headers = {
     'auth-token': AUTH_TOKEN,
@@ -22,6 +23,7 @@ export default async function handler(req, res) {
     let upstream;
 
     if (type === 'otp') {
+      // Fetch OTP for given app/carrier
       upstream = await fetch('https://raazit.acchub.io/api/', {
         method: 'POST',
         headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -29,9 +31,12 @@ export default async function handler(req, res) {
       });
 
     } else if (type === 'number') {
+      // Generate a number for a specific country and carrier
+      const appId = buildAppId(country);
       const form = new URLSearchParams();
-      form.append('app', app);
-      form.append('carrier', carrier);
+      form.append('app', appId);
+      form.append('carrier', carrier || 'global');
+
       upstream = await fetch('https://raazit.acchub.io/api/sms/', {
         method: 'POST',
         headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -44,7 +49,7 @@ export default async function handler(req, res) {
       });
 
     } else if (type === 'carriers') {
-      const appParam = encodeURIComponent(app || 'airbnb--KH-855');
+      const appParam = encodeURIComponent(app || buildAppId(country));
       upstream = await fetch(`https://raazit.acchub.io/api/sms/carrier-list/?app=${appParam}&_=${Date.now()}`, {
         method: 'GET', headers
       });
@@ -60,7 +65,6 @@ export default async function handler(req, res) {
       const json = JSON.parse(text);
       return res.status(200).json(json);
     } catch (e) {
-      // return as plain text if not JSON
       res.setHeader('Content-Type', 'text/plain; charset=utf-8');
       return res.status(200).send(text);
     }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kami Flex Fake Number</title>
+  <title>Kami Flex Fake Numbers & OTP</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <style>
     body { background:#071a2a; color:white; font-family:sans-serif; }
@@ -15,112 +15,64 @@
     }
     .card {
       background:rgba(255,255,255,0.05);
-      border-radius:15px; padding:20px; max-width:400px; margin:auto;
+      border-radius:15px; padding:20px; max-width:500px; margin:auto;
       box-shadow:0 0 20px rgba(6,182,212,0.3);
     }
     .error { color:#ff4d4d; font-weight:bold; }
+    pre { background:black; padding:10px; border-radius:8px; overflow-x:auto; }
   </style>
 </head>
 <body class="p-6">
 
-  <h1 class="kami-title">Kami Flex Fake Number</h1>
+  <h1 class="kami-title">Kami Flex Fake Numbers & OTP</h1>
 
-  <div class="card space-y-4">
-    <!-- Country -->
-    <select id="country" class="w-full p-2 rounded text-black" onclick="loadCountries()">
-      <option value="">Select Country</option>
-    </select>
+  <div class="card space-y-6">
+    <!-- NUMBER BUTTON -->
+    <div>
+      <button onclick="getNumber()" class="w-full bg-gradient-to-r from-green-500 to-teal-600 px-4 py-2 rounded text-white font-bold">📱 Get Number</button>
+      <div id="numberResult" class="mt-3"><pre>No number yet</pre></div>
+      <button onclick="copyResult('numberResult')" class="mt-2 px-4 py-2 bg-pink-600 rounded text-white">📋 Copy Number</button>
+    </div>
 
-    <!-- Carrier -->
-    <select id="carrier" class="w-full p-2 rounded text-black" onclick="loadCarriers()">
-      <option value="">Select Carrier</option>
-    </select>
-
-    <!-- Buttons -->
-    <button onclick="generateNumber()" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-2 rounded text-white font-bold">📱 Generate Number</button>
-    <button onclick="checkOtp()" class="w-full bg-gradient-to-r from-green-500 to-teal-600 px-4 py-2 rounded text-white font-bold">🔑 Check OTP</button>
-
-    <!-- Result -->
-    <div id="result" class="mt-4 p-3 bg-black rounded text-sm">No number yet</div>
-    <button onclick="copyResult()" class="mt-2 px-4 py-2 bg-pink-600 rounded text-white">📋 Copy</button>
+    <!-- OTP BUTTON -->
+    <div>
+      <button onclick="getOtp()" class="w-full bg-gradient-to-r from-purple-500 to-indigo-600 px-4 py-2 rounded text-white font-bold">🔑 Get OTP</button>
+      <div id="otpResult" class="mt-3"><pre>No OTP yet</pre></div>
+      <button onclick="copyResult('otpResult')" class="mt-2 px-4 py-2 bg-pink-600 rounded text-white">📋 Copy OTP</button>
+    </div>
   </div>
 
-  <!-- fake.js include -->
-  <script src="js/fake.js"></script>
-
   <script>
-    async function loadCountries() {
-      const countrySelect = document.getElementById("country");
-      if (countrySelect.options.length > 1) return;
-
-      countrySelect.innerHTML = "<option>Loading...</option>";
+    async function getNumber() {
+      const result = document.getElementById("numberResult");
+      result.innerHTML = "<pre>⏳ Fetching Number...</pre>";
       try {
-        const countries = await handler("countries");
-        if (!countries || countries.length === 0) throw new Error("No countries found");
-        countrySelect.innerHTML = '<option value="">Select Country</option>';
-        countries.forEach(c => {
-          const opt = document.createElement("option");
-          opt.value = c.code;
-          opt.textContent = c.name;
-          countrySelect.appendChild(opt);
-        });
+        const res = await fetch("/api/fake?type=number&app=global--AF-93&carrier=619");
+        const data = await res.json();
+        result.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
       } catch (err) {
-        countrySelect.innerHTML = `<option class="error">❌ Error loading countries</option>`;
+        result.innerHTML = `<span class="error">❌ Failed to fetch Number</span>`;
         console.error(err);
       }
     }
 
-    async function loadCarriers() {
-      const carrierSelect = document.getElementById("carrier");
-      if (carrierSelect.options.length > 1) return;
-
-      carrierSelect.innerHTML = "<option>Loading...</option>";
+    async function getOtp() {
+      const result = document.getElementById("otpResult");
+      result.innerHTML = "<pre>⏳ Fetching OTP...</pre>";
       try {
-        const carriers = await handler("carriers");
-        if (!carriers || carriers.length === 0) throw new Error("No carriers found");
-        carrierSelect.innerHTML = '<option value="">Select Carrier</option>';
-        carriers.forEach(c => {
-          const opt = document.createElement("option");
-          opt.value = c.id;
-          opt.textContent = c.name;
-          carrierSelect.appendChild(opt);
-        });
-      } catch (err) {
-        carrierSelect.innerHTML = `<option class="error">❌ Error loading carriers</option>`;
-        console.error(err);
-      }
-    }
-
-    async function generateNumber() {
-      const result = document.getElementById("result");
-      result.innerText = "⏳ Generating...";
-      try {
-        const data = await handler("number");
-        if (!data) throw new Error("No number returned");
-        result.innerText = JSON.stringify(data, null, 2);
-      } catch (err) {
-        result.innerHTML = `<span class="error">❌ Failed to generate number</span>`;
-        console.error(err);
-      }
-    }
-
-    async function checkOtp() {
-      const result = document.getElementById("result");
-      result.innerText = "⏳ Fetching OTP...";
-      try {
-        const data = await handler("otp");
-        if (!data) throw new Error("No OTP returned");
-        result.innerText = JSON.stringify(data, null, 2);
+        const res = await fetch("/api/fake?type=otp");
+        const data = await res.json();
+        result.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
       } catch (err) {
         result.innerHTML = `<span class="error">❌ Failed to fetch OTP</span>`;
         console.error(err);
       }
     }
 
-    function copyResult() {
-      const text = document.getElementById("result").innerText;
+    function copyResult(id) {
+      const text = document.getElementById(id).innerText;
       navigator.clipboard.writeText(text);
-      alert("Copied: " + text);
+      alert("✅ Copied:\n" + text);
     }
   </script>
 </body>

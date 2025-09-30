@@ -2,7 +2,7 @@
   "name": "kami-flex-fake",
   "version": "1.0.0",
   "description": "Kami Flex Fake Number API with Vercel",
-  "main": "api/fake.js",
+  "main": "fake.js",
   "scripts": {
     "start": "vercel dev",
     "test": "echo \"No tests specified\" && exit 0"

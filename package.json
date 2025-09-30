@@ -2,15 +2,8 @@
   "name": "kami-flex-fake",
   "version": "1.0.0",
   "description": "Kami Flex Fake Number API with Vercel",
-  "main": "fake.js",
   "scripts": {
-    "start": "vercel dev",
-    "test": "echo \"No tests specified\" && exit 0"
+    "start": "vercel dev"
   },
-  "keywords": ["vercel", "fake-number", "kami-flex"],
-  "author": "Kaami Broken 💔",
-  "license": "MIT",
-  "engines": {
-    "node": "18.x"
-  }
+  "license": "MIT"
 }

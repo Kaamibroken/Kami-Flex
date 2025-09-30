@@ -1,153 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kami Flex — Fake Number AF</title>
-  <style>
-    body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans", sans-serif;
-      background: #071024;
-      color: #eef2ff;
-      display: flex;
-      justify-content: center;
-      padding: 20px;
-    }
-    .card {
-      width: 100%;
-      max-width: 500px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.06);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-    }
-    h1 { margin:0 0 15px 0; font-size:22px; text-align:center; }
-    #numberBox {
-      font-size: 20px;
-      background: rgba(0,0,0,0.25);
-      padding: 12px;
-      border-radius: 8px;
-      text-align:center;
-      margin-bottom: 12px;
-    }
-    .row { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:10px;}
-    button {
-      padding: 10px 14px;
-      border-radius:8px;
-      border:none;
-      cursor:pointer;
-      background:#5b6cff;
-      color:white;
-      font-weight:600;
-    }
-    button.secondary { background:transparent; border:1px solid rgba(255,255,255,0.12); color:#eef2ff; }
-    #loader { display:none; text-align:center; margin:10px 0; }
-    #otpBox {
-      margin-top:12px;
-      background: rgba(0,0,0,0.12);
-      padding:12px;
-      border-radius:8px;
-      min-height:50px;
-      text-align:center;
-      font-weight:700;
-      font-size:18px;
-      color:#b7ff6a;
-    }
-    .notice { 
-      padding:10px; 
-      background:rgba(255,255,255,0.03); 
-      border-radius:8px; 
-      margin-top:10px; 
-      color:#ffd; 
-      border:1px solid rgba(255,255,255,0.03);
-      text-align:center;
-      font-size:14px;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kami Flex VIP Fake Number AF</title>
+<style>
+:root{
+  --bg:#071024;
+  --card:#0c1a38;
+  --accent:#5b6cff;
+  --text:#eef2ff;
+  --muted:#9aa4b2;
+  --highlight:#ffd700;
+}
+body{
+  margin:0;
+  font-family:'Inter',system-ui,Arial;
+  background:linear-gradient(180deg,#071024,#0b1020);
+  color:var(--text);
+  display:flex;
+  justify-content:center;
+  padding:20px;
+}
+.card{
+  width:100%;
+  max-width:500px;
+  background:var(--card);
+  padding:25px;
+  border-radius:15px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.6);
+}
+h1{
+  margin:0 0 15px 0;
+  font-size:26px;
+  text-align:center;
+  color:var(--highlight);
+  text-shadow:0 0 6px var(--accent);
+}
+.row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin-bottom:15px;
+}
+button{
+  background:var(--accent);
+  color:#fff;
+  border:0;
+  padding:12px 18px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+  box-shadow:0 4px 15px rgba(0,0,0,0.4);
+  transition:0.2s all;
+}
+button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 20px rgba(0,0,0,0.6);
+}
+button.secondary{
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.12);
+  color:var(--text);
+}
+#numberBox,#otpBox{
+  background:rgba(0,0,0,0.25);
+  padding:15px;
+  border-radius:10px;
+  text-align:center;
+  font-weight:bold;
+  font-size:20px;
+  width:100%;
+  box-shadow:inset 0 0 10px rgba(255,255,255,0.1);
+}
+#otpBox{
+  margin-top:12px;
+  background:rgba(255,255,255,0.05);
+  font-size:18px;
+  color:#b7ff6a;
+}
+#loader{
+  display:none;
+  margin-left:10px;
+  font-size:18px;
+  animation:spin 1.2s linear infinite;
+}
+@keyframes spin{
+  0%{transform:rotate(0deg);}
+  100%{transform:rotate(360deg);}
+}
+.notice{
+  padding:12px;
+  background:rgba(255,255,255,0.03);
+  border-radius:10px;
+  margin-top:15px;
+  color:var(--muted);
+  border:1px solid rgba(255,255,255,0.05);
+  text-align:center;
+  font-size:14px;
+}
+.copy{
+  padding:8px 12px;
+  border-radius:8px;
+  background:#173644;
+  color:#cfe8ea;
+  border:0;
+  cursor:pointer;
+  font-weight:600;
+  margin-left:5px;
+}
+.copy:hover{
+  background:#1f4b55;
+}
+</style>
 </head>
 <body>
-  <div class="card">
-    <h1>🎯 Kami Flex Fake Number AF</h1>
-    <div id="numberBox">Press "Generate Number"</div>
-    <div class="row">
-      <button id="generateBtn">Generate Number</button>
-      <button id="clearBtn" class="secondary">Clear</button>
-      <button id="refreshBtn">Refresh OTP</button>
-      <button id="copyBtn" class="secondary">Copy OTP</button>
-    </div>
-    <div id="loader">⏳ Loading...</div>
-    <div id="otpBox">OTP will appear here</div>
-    <div id="infoBox" class="notice">First generate a number to start</div>
-  </div>
+<div class="card">
+<h1>Kami Flex VIP Fake Number AF</h1>
+<div class="row">
+<div id="numberBox">Click "Generate Number"</div>
+<button id="generateBtn">Generate Number</button>
+<button id="copyBtn" class="copy">Copy</button>
+<div id="loader">⏳</div>
+</div>
+
+<div class="row">
+<button id="refreshBtn">Refresh OTP</button>
+<button id="clearBtn" class="secondary">Clear</button>
+</div>
+
+<div id="otpBox">OTP will appear here</div>
+<div id="infoBox" class="notice">Click "Generate Number" to get Afghanistan number and OTP</div>
+</div>
 
 <script>
-let currentNumber = '';
-let currentOtp = '';
+let currentNumber="", currentOtp="";
 
-const numberBox = document.getElementById('numberBox');
-const otpBox = document.getElementById('otpBox');
-const loader = document.getElementById('loader');
-const infoBox = document.getElementById('infoBox');
-
-function setLoading(state) {
-  loader.style.display = state ? 'block' : 'none';
+function setLoading(on){
+  document.getElementById('loader').style.display=on?'inline-block':'none';
 }
 
-// Generate Number
-document.getElementById('generateBtn').addEventListener('click', async ()=>{
+async function generateNumber(){
   setLoading(true);
-  numberBox.textContent = 'Generating...';
-  infoBox.style.display = 'none';
+  document.getElementById('numberBox').innerText='Generating...';
+  document.getElementById('infoBox').style.display='none';
   try{
-    const res = await fetch('/api/fake?type=number&country=AF');
-    const data = await res.json();
+    const res=await fetch('/api/fake?type=number');
+    const data=await res.json();
     if(data && data.number){
-      currentNumber = data.number;
-      numberBox.textContent = '📞 ' + currentNumber;
-      otpBox.textContent = data.otp || '';
-      currentOtp = data.otp || '';
-    } else {
-      numberBox.textContent = '❌ Failed';
-      infoBox.textContent = 'Could not generate number, try again.';
-      infoBox.style.display = 'block';
+      currentNumber=data.number;
+      currentOtp=data.otp||'';
+      document.getElementById('numberBox').innerText='📞 '+currentNumber;
+      document.getElementById('otpBox').innerText='OTP: '+currentOtp;
+      try{await navigator.clipboard.writeText(currentNumber);}catch(e){}
+    }else{
+      document.getElementById('numberBox').innerText='❌ Failed';
+      document.getElementById('infoBox').innerText='Failed to generate number';
+      document.getElementById('infoBox').style.display='block';
     }
-  }catch(e){
-    numberBox.textContent = '⚠️ Error';
-    infoBox.textContent = e.message || e;
-    infoBox.style.display = 'block';
-  } finally { setLoading(false); }
-});
+  }catch(err){
+    document.getElementById('numberBox').innerText='⚠️ Error';
+    document.getElementById('infoBox').innerText='Network error: '+err.message;
+    document.getElementById('infoBox').style.display='block';
+  }finally{setLoading(false);}
+}
 
-// Refresh OTP
-document.getElementById('refreshBtn').addEventListener('click', async ()=>{
-  if(!currentNumber) return alert('Generate a number first');
+async function refreshOtp(){
+  if(!currentNumber){alert('Generate number first'); return;}
   setLoading(true);
   try{
-    const res = await fetch('/api/fake?type=otp&number=' + encodeURIComponent(currentNumber));
-    const data = await res.json();
-    currentOtp = data.otp || '';
-    otpBox.textContent = currentOtp || 'No OTP yet';
-  }catch(e){ otpBox.textContent = '⚠️ Error fetching OTP'; }
-  finally{ setLoading(false); }
-});
+    const res=await fetch('/api/fake?type=otp&number='+encodeURIComponent(currentNumber));
+    const data=await res.json();
+    currentOtp=data.otp||'';
+    document.getElementById('otpBox').innerText='OTP: '+currentOtp;
+  }catch(e){alert('OTP fetch failed');}finally{setLoading(false);}
+}
 
-// Clear
-document.getElementById('clearBtn').addEventListener('click', ()=>{
+document.getElementById('generateBtn').addEventListener('click',generateNumber);
+document.getElementById('refreshBtn').addEventListener('click',refreshOtp);
+document.getElementById('copyBtn').addEventListener('click',async ()=>{
+  if(!currentNumber){alert('Generate number first'); return;}
+  try{await navigator.clipboard.writeText(currentNumber);alert('Copied: '+currentNumber);}catch(e){alert('Failed');}
+});
+document.getElementById('clearBtn').addEventListener('click',()=>{
   currentNumber=''; currentOtp='';
-  numberBox.textContent='Press "Generate Number"';
-  otpBox.textContent='OTP will appear here';
-  infoBox.style.display='block';
-  infoBox.textContent='First generate a number to start';
-});
-
-// Copy OTP
-document.getElementById('copyBtn').addEventListener('click', async ()=>{
-  if(!currentOtp) return alert('No OTP to copy');
-  try{
-    await navigator.clipboard.writeText(currentOtp);
-    alert('OTP copied: ' + currentOtp);
-  }catch(e){ alert('Failed to copy'); }
+  document.getElementById('numberBox').innerText='Click "Generate Number"';
+  document.getElementById('otpBox').innerText='OTP will appear here';
+  document.getElementById('infoBox').style.display='block';
+  document.getElementById('infoBox').innerText='Cleared';
 });
 </script>
 </body>

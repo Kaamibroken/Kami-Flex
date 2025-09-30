@@ -1,155 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Kami Flex — Fake Number</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kami Flex Fake Number</title>
 <style>
-:root {
-  --bg:#071a2a;
-  --card:rgba(255,255,255,0.04);
-  --accent:#06b6d4;
-  --text:#eef2ff;
-  --muted:#9aa4b2;
-}
-body {
-  margin:0; font-family:Inter,system-ui,Arial; background:var(--bg); color:var(--text); padding:20px;
-}
-.container { max-width:1000px; margin:auto; }
-header { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; }
-h1 { margin:0 0 6px 0; color:var(--accent); }
-.meta { font-size:13px; color:var(--muted); }
-.controls { display:flex; flex-wrap:wrap; gap:10px; margin:12px 0; }
-button { background:var(--accent); border:none; color:#042; padding:10px 16px; border-radius:8px; cursor:pointer; }
-button.secondary { background:transparent; border:1px solid var(--accent); color:var(--accent); }
-input, select { padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background:transparent; color:inherit; }
-.card { background:var(--card); padding:15px; border-radius:10px; margin-top:12px; }
-#numberBox { font-size:20px; font-weight:bold; margin:10px 0; }
-#otpBox { font-weight:bold; color:#b7ff6a; margin-left:10px; }
-.list, .daily { display:grid; gap:10px; margin-top:8px; }
-.item { display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:rgba(255,255,255,0.02); align-items:center; }
-.copyBtn { padding:6px 10px; border-radius:6px; background:#173644; color:#cfe8ea; border:0; cursor:pointer; }
-#log { width:100%; height:150px; margin-top:12px; border-radius:8px; background:#02101a; color:#cfe8ea; border:0; padding:10px; resize:vertical; }
+:root{--bg:#071a2a;--card:rgba(255,255,255,0.04);--muted:#9aa4b2;--accent:#06b6d4}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans",sans-serif;background:var(--bg);color:#eef2ff;margin:0;padding:20px;display:flex;justify-content:center}
+.container{max-width:900px;width:100%;}
+.card{background:var(--card);padding:18px;border-radius:12px;margin-bottom:18px;box-shadow:0 6px 20px rgba(0,0,0,0.4)}
+h1{margin:0 0 12px;font-size:24px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button{padding:10px 14px;border-radius:8px;border:none;background:var(--accent);color:#042;cursor:pointer}
+button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.12);color:#eef2ff}
+input,select{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.25);color:#eef2ff}
+#numberBox{background:rgba(0,0,0,0.25);padding:10px;border-radius:8px;min-width:200px}
+.item{display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;margin-bottom:6px}
+.copyBtn{padding:6px 10px;background:#173644;color:#cfe8ea;border:0;border-radius:6px;cursor:pointer}
+.otp{font-weight:700;color:#b7ff6a;margin-left:10px}
+.small{font-size:13px;color:#9aa4b2}
 </style>
 </head>
 <body>
 <div class="container">
-  <header>
-    <div>
-      <h1>Kami Flex — Fake Number</h1>
-      <div class="meta">All Countries • Generate number & OTP automatically</div>
-    </div>
-    <div style="min-width:220px">
-      <label class="meta">App ID</label><br/>
-      <input id="appInput" placeholder="global--AF-93" value="global--AF-93"/>
-    </div>
-  </header>
-
-  <div class="controls">
-    <select id="countrySelect" style="min-width:180px"></select>
-    <input id="carrierInput" placeholder="Carrier (optional)" />
-    <button id="getNumberBtn">Get Number</button>
-    <button id="refreshBtn" class="secondary">Refresh OTPs</button>
-  </div>
-
   <div class="card">
-    <div>📱 Current Number:</div>
-    <div id="numberBox">No number yet</div>
-    <div>OTP: <span id="otpBox">---</span></div>
+    <h1>🎯 Kami Flex — Fake Number</h1>
+    <div class="row">
+      <select id="countrySelect"><option>Loading countries...</option></select>
+      <input id="carrierInput" placeholder="Carrier (optional)" />
+      <button id="getNumberBtn">Get Number</button>
+      <div id="numberBox">Number will appear here</div>
+    </div>
   </div>
 
   <div class="card">
     <h3>Generated Numbers</h3>
-    <div id="daily" class="daily"></div>
-    <div id="list" class="list"></div>
+    <div id="numberList"></div>
   </div>
-
-  <textarea id="log" readonly placeholder="Logs appear here..."></textarea>
 </div>
 
 <script>
-let currentNumber = "";
-let currentOTP = "";
-const numbersCache = [];
-
 const countrySelect = document.getElementById('countrySelect');
-const appInput = document.getElementById('appInput');
 const carrierInput = document.getElementById('carrierInput');
+const getNumberBtn = document.getElementById('getNumberBtn');
 const numberBox = document.getElementById('numberBox');
-const otpBox = document.getElementById('otpBox');
-const dailyEl = document.getElementById('daily');
-const listEl = document.getElementById('list');
-const logEl = document.getElementById('log');
+const numberList = document.getElementById('numberList');
 
-async function api(params={}) {
-  const url = '/api/fake?' + new URLSearchParams(params);
-  const res = await fetch(url, {cache:'no-store'});
-  return await res.text();
+// helper API call
+async function api(params = {}) {
+  const url = '/api/fake?' + new URLSearchParams(params).toString();
+  const res = await fetch(url);
+  const text = await res.text();
+  try { return JSON.parse(text); } catch(e){ return text; }
 }
 
-function log(msg){ logEl.value = `[${new Date().toLocaleTimeString()}] ${msg}\n` + logEl.value; }
-
-function renderNumbers(){
-  dailyEl.innerHTML=''; listEl.innerHTML='';
-  numbersCache.forEach((item,idx)=>{
-    const el = document.createElement('div'); el.className='item';
-    const left = document.createElement('div'); left.innerText = item.number || '(no number)';
-    const right = document.createElement('div');
-    const copyBtn = document.createElement('button'); copyBtn.className='copyBtn'; copyBtn.textContent='Copy';
-    copyBtn.onclick = ()=>{ navigator.clipboard.writeText(item.number||''); copyBtn.textContent='Copied'; setTimeout(()=>copyBtn.textContent='Copy',1200); };
-    const otpSpan = document.createElement('span'); otpSpan.textContent = item.otp || '';
-    right.appendChild(copyBtn); right.appendChild(otpSpan);
-    el.appendChild(left); el.appendChild(right);
-    if(idx<12){ dailyEl.appendChild(el); } else { listEl.appendChild(el); }
-  });
-}
-
-document.getElementById('getNumberBtn').onclick = async ()=>{
-  const app = appInput.value || undefined;
-  const carrier = carrierInput.value || undefined;
-  log('Requesting number...');
-  try {
-    const txt = await api({ type:'number', app, carrier });
-    let data;
-    try { data = JSON.parse(txt); } catch(e){ data = { number: txt }; }
-    currentNumber = data.number || 'N/A';
-    currentOTP = '';
-    numberBox.innerText = currentNumber;
-    otpBox.innerText = currentOTP;
-    numbersCache.unshift({ number: currentNumber, otp: currentOTP, raw: txt });
-    renderNumbers();
-    await refreshOtps();
-  } catch(e){ log('Number fetch failed: '+e.message); }
-};
-
-async function refreshOtps(){
-  log('Refreshing OTPs...');
-  try {
-    const txt = await api({ type:'otp' });
-    let matches = txt.match(/\b[0-9]{4,8}\b/g) || [];
-    if(currentNumber && matches.length) currentOTP = matches[0];
-    otpBox.innerText = currentOTP || '---';
-    numbersCache.forEach(item=>{
-      if(!item.otp && matches.length) item.otp = matches.shift();
-    });
-    renderNumbers();
-  } catch(e){ log('OTP refresh failed: '+e.message); }
-}
-
+// load countries
 async function loadCountries(){
-  try{
-    const txt = await api({ type:'countries' });
-    let data = JSON.parse(txt);
-    countrySelect.innerHTML = '';
-    if(Array.isArray(data)){
-      data.forEach(c=>{
-        const opt = document.createElement('option'); opt.value=c.code||c.id; opt.textContent=c.name||c.country; countrySelect.appendChild(opt);
-      });
-    }
-  }catch(e){ log('Country load failed: '+e.message); }
+  const data = await api({type:'countries'});
+  countrySelect.innerHTML = '';
+  if(Array.isArray(data)){
+    data.forEach(c=>{
+      const opt = document.createElement('option');
+      opt.value = c.id || c.code || c.name;
+      opt.textContent = c.name || c.country || c.id;
+      countrySelect.appendChild(opt);
+    });
+  } else {
+    countrySelect.innerHTML='<option>All Countries</option>';
+  }
 }
 
-// init
+// get number
+async function getNumber(){
+  const country = countrySelect.value;
+  const carrier = carrierInput.value;
+  numberBox.textContent='Generating...';
+  const data = await api({type:'number', app:'global--AF-93', carrier});
+  let num = '';
+  if(data){
+    if(typeof data==='string'){
+      const m = data.match(/\+?\d{6,15}/);
+      if(m) num=m[0];
+    } else {
+      num=data.number || data.phone || '';
+    }
+  }
+  numberBox.textContent=num||'No number';
+  // add to list
+  const div = document.createElement('div');
+  div.className='item';
+  div.innerHTML=`<div>${num || '-'}</div>`;
+  const copyBtn = document.createElement('button');
+  copyBtn.className='copyBtn'; copyBtn.textContent='Copy';
+  copyBtn.onclick = ()=>{navigator.clipboard.writeText(num);copyBtn.textContent='Copied';setTimeout(()=>copyBtn.textContent='Copy',1200);}
+  div.appendChild(copyBtn);
+  numberList.prepend(div);
+}
+
+getNumberBtn.addEventListener('click', getNumber);
+
+// initial load
 loadCountries();
 </script>
 </body>

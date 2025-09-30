@@ -1,11 +1,11 @@
 {
-  "name": "kami-flex-fakenumber",
+  "name": "kami-flex-fake-number",
   "version": "1.0.0",
-  "private": true,
-  "dependencies": {
-    "node-fetch": "^2.6.7"
-  },
+  "type": "module",
   "scripts": {
     "start": "vercel dev"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
   }
 }

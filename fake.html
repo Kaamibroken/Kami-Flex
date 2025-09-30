@@ -1,152 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Kami Flex Fake Number AF</title>
 <style>
-  :root {
-    --bg: #071a2a;
-    --card: rgba(255,255,255,0.05);
-    --muted: #9aa4b2;
-    --accent: #06b6d4;
-    --copy: #b7ff6a;
-  }
-  body {
-    margin:0; padding:0; font-family:sans-serif;
-    background: linear-gradient(180deg,#071024,#071a2a);
-    color:#e6eef6;
-  }
-  .container {
-    max-width: 900px; margin:auto; padding:20px;
-  }
-  h1 {
-    text-align:center; margin-bottom:10px; color:var(--accent);
-  }
-  .controls {
-    display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;
-  }
-  button, select, input {
-    padding:8px 12px;
-    border-radius:6px;
-    border:1px solid rgba(255,255,255,0.1);
-    background:transparent;
-    color:inherit;
-    cursor:pointer;
-  }
-  button {
-    background:var(--accent);
-    color:#071a2a;
-  }
-  .card {
-    background:var(--card); padding:12px; border-radius:10px; margin-bottom:15px;
-  }
-  .item {
-    display:flex; justify-content:space-between; align-items:center;
-    padding:8px; background:rgba(255,255,255,0.02); border-radius:6px; margin-bottom:5px;
-  }
-  .otp { font-weight:bold; color:var(--copy); margin-left:10px; }
-  .copy { background:#173644; border:none; padding:5px 8px; cursor:pointer; border-radius:5px; }
-  textarea { width:100%; height:120px; background:#02101a; border:none; border-radius:8px; padding:10px; color:#cfe8ea; resize:vertical; margin-top:10px; }
+  body{font-family:system-ui,sans-serif;background:#0b1020;color:#eef2ff;display:flex;flex-direction:column;align-items:center;padding:18px}
+  .card{width:100%;max-width:600px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:20px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.5)}
+  h1{margin:0 0 10px;font-size:22px;text-align:center;color:#06b6d4}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+  button{background:#06b6d4;color:white;border:0;padding:10px 14px;border-radius:8px;cursor:pointer}
+  button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.2)}
+  #numberBox{background:rgba(0,0,0,0.2);padding:10px;border-radius:8px;min-width:220px;text-align:center;font-weight:700;font-size:18px}
+  #loader{display:none;margin-left:10px}
+  #otpBox{background:rgba(0,0,0,0.12);padding:10px;border-radius:8px;margin-top:10px;text-align:center;font-weight:600;font-size:16px}
+  #log{width:100%;height:120px;margin-top:12px;border-radius:8px;background:#02101a;color:#cfe8ea;border:0;padding:10px;resize:vertical;font-size:13px;overflow:auto}
+  .small{font-size:13px;color:#9aa4b2}
 </style>
 </head>
 <body>
-<div class="container">
-  <h1>Kami Flex Fake Number AF</h1>
-  <div class="controls">
-    <input type="text" id="appInput" placeholder="App ID" value="global--AF-93">
-    <input type="text" id="carrierInput" placeholder="Carrier" value="619">
+
+<div class="card">
+  <h1>🎯 Kami Flex Fake Number AF</h1>
+  
+  <div class="row">
+    <div id="numberBox">Click "Generate" first</div>
     <button id="generateBtn">Generate Number</button>
-    <button id="refreshBtn">Refresh OTP</button>
-    <button id="clearBtn">Clear</button>
+    <button id="copyBtn" class="secondary">Copy Number</button>
+    <div id="loader">⏳ Loading...</div>
   </div>
 
-  <div class="card">
-    <h3>Generated Number</h3>
-    <div id="numberDisplay" class="item">
-      <span id="numberText">--</span>
-      <button id="copyBtn" class="copy">Copy</button>
-      <span id="otpText" class="otp">--</span>
-    </div>
+  <div class="row">
+    <button id="refreshOtp">Refresh OTP</button>
+    <button id="clearBtn" class="secondary">Clear</button>
   </div>
 
-  <textarea id="log" readonly placeholder="Logs & raw responses"></textarea>
+  <div id="otpBox">OTP will appear here</div>
+
+  <textarea id="log" readonly placeholder="Logs appear here..."></textarea>
 </div>
 
 <script>
-const generateBtn = document.getElementById('generateBtn');
-const refreshBtn = document.getElementById('refreshBtn');
-const clearBtn = document.getElementById('clearBtn');
-const numberText = document.getElementById('numberText');
-const otpText = document.getElementById('otpText');
-const copyBtn = document.getElementById('copyBtn');
-const log = document.getElementById('log');
-const appInput = document.getElementById('appInput');
-const carrierInput = document.getElementById('carrierInput');
+let currentNumber = '';
+let currentOtp = '';
+const numberBox = document.getElementById('numberBox');
+const otpBox = document.getElementById('otpBox');
+const loader = document.getElementById('loader');
+const logEl = document.getElementById('log');
 
-async function api(type, app, carrier){
-  try {
-    const params = new URLSearchParams({type, app, carrier});
-    const res = await fetch('/api/fake?' + params.toString());
-    const data = await res.json();
-    return data;
-  } catch(e){
-    appendLog('API error: '+e.message);
-    return null;
-  }
-}
-
-function appendLog(msg){
+function log(msg){
   const ts = new Date().toLocaleTimeString();
-  log.value = `[${ts}] ${msg}\n` + log.value;
+  logEl.value = `[${ts}] ${msg}\n` + logEl.value;
 }
 
-generateBtn.addEventListener('click', async ()=>{
-  appendLog('Generating number...');
-  const app = appInput.value;
-  const carrier = carrierInput.value;
-  const data = await api('number', app, carrier);
-  if(!data) return;
-  // try pick number & id
-  let number='', otp='';
-  if(Array.isArray(data.data)){
-    number = data.data[0]?.number || '--';
-    otp = data.data[0]?.otp || '--';
-  } else if(data.number){
-    number = data.number;
-    otp = data.otp || '--';
+function setLoading(on){
+  loader.style.display = on ? 'inline-block' : 'none';
+}
+
+// fetch number
+async function generateNumber(){
+  setLoading(true);
+  numberBox.textContent = 'Generating...';
+  try{
+    const res = await fetch('/api/fake?type=number&app=global--AF-93&carrier=619');
+    const text = await res.text();
+    let json;
+    try{ json = JSON.parse(text); } catch(e){ json = { raw: text }; }
+    
+    if(json.data?.number || json.number){
+      currentNumber = json.data?.number || json.number;
+      numberBox.textContent = currentNumber;
+      log('Number generated: ' + currentNumber);
+      fetchOtp();
+    } else {
+      numberBox.textContent = '❌ Failed';
+      log('Number generation failed: ' + text);
+    }
+  }catch(err){
+    numberBox.textContent = '⚠️ Error';
+    log('Error: ' + err.message);
+  } finally { setLoading(false); }
+}
+
+// fetch OTP
+async function fetchOtp(){
+  if(!currentNumber) return log('No number generated');
+  otpBox.textContent = 'Fetching OTP...';
+  try{
+    const res = await fetch('/api/fake?type=otp');
+    const text = await res.text();
+    let matches = text.match(/\b[0-9]{4,8}\b/g);
+    if(matches && matches.length>0){
+      currentOtp = matches[0];
+      otpBox.textContent = 'OTP: ' + currentOtp;
+      log('OTP fetched: ' + currentOtp);
+    } else {
+      otpBox.textContent = 'No OTP found';
+      log('No OTP in response: ' + text);
+    }
+  }catch(err){
+    otpBox.textContent = '⚠️ Error';
+    log('OTP fetch error: ' + err.message);
   }
-  numberText.textContent = number;
-  otpText.textContent = otp;
-  appendLog('Number generated: ' + number);
+}
+
+// copy number
+document.getElementById('copyBtn').addEventListener('click', async ()=>{
+  if(!currentNumber) return alert('Generate first');
+  try{ await navigator.clipboard.writeText(currentNumber); alert('Copied: ' + currentNumber); }
+  catch(e){ alert('Copy failed'); }
 });
 
-refreshBtn.addEventListener('click', async ()=>{
-  appendLog('Refreshing OTP...');
-  const data = await api('otp');
-  if(!data) return;
-  let otpVal = '--';
-  if(Array.isArray(data.data) && data.data[0]?.otp) otpVal = data.data[0].otp;
-  else if(data.otp) otpVal = data.otp;
-  otpText.textContent = otpVal;
-  appendLog('OTP refreshed: '+otpVal);
-});
+// generate number
+document.getElementById('generateBtn').addEventListener('click', generateNumber);
 
-clearBtn.addEventListener('click', ()=>{
-  numberText.textContent = '--';
-  otpText.textContent = '--';
-  log.value = '';
-});
+// refresh OTP
+document.getElementById('refreshOtp').addEventListener('click', fetchOtp);
 
-copyBtn.addEventListener('click', async ()=>{
-  try {
-    await navigator.clipboard.writeText(numberText.textContent);
-    copyBtn.textContent='Copied';
-    setTimeout(()=>copyBtn.textContent='Copy',1200);
-  } catch(e){
-    appendLog('Copy failed');
-  }
+// clear
+document.getElementById('clearBtn').addEventListener('click', ()=>{
+  currentNumber = '';
+  currentOtp = '';
+  numberBox.textContent = 'Click "Generate" first';
+  otpBox.textContent = 'OTP will appear here';
+  log('Cleared');
 });
 </script>
+
 </body>
 </html>

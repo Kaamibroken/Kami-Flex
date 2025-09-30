@@ -4,81 +4,117 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kami Flex Fake Number</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <style>
-    body { background: #071a2a; color: white; font-family: sans-serif; }
+    body { background:#071a2a; color:white; font-family:sans-serif; }
     .kami-title {
-      font-size: 28px;
-      font-weight: bold;
-      background: linear-gradient(90deg,#06b6d4,#9333ea);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-align: center;
-      margin-bottom: 20px;
+      font-size:28px; font-weight:bold;
+      background:linear-gradient(90deg,#06b6d4,#9333ea);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      text-align:center; margin-bottom:20px;
     }
     .card {
-      background: rgba(255,255,255,0.05);
-      border-radius: 15px;
-      padding: 20px;
-      max-width: 400px;
-      margin: auto;
-      box-shadow: 0 0 20px rgba(6,182,212,0.3);
+      background:rgba(255,255,255,0.05);
+      border-radius:15px; padding:20px; max-width:400px; margin:auto;
+      box-shadow:0 0 20px rgba(6,182,212,0.3);
     }
+    .error { color:#ff4d4d; font-weight:bold; }
   </style>
 </head>
 <body class="p-6">
 
-  <button onclick="window.location.href='index.html'" 
-          class="mb-4 bg-purple-600 hover:bg-purple-800 text-white px-4 py-2 rounded-lg">
-    ⬅ Back
-  </button>
-
-  <h1 class="kami-title">Kami Flex Fake Number Generator</h1>
+  <h1 class="kami-title">Kami Flex Fake Number</h1>
 
   <div class="card space-y-4">
-    <select id="app" class="w-full p-2 rounded text-black">
-      <option value="">Select App / Country</option>
-      <option value="global--AF-93">Afghanistan</option>
-      <option value="global--PK-92">Pakistan</option>
+    <!-- Country -->
+    <select id="country" class="w-full p-2 rounded text-black" onclick="loadCountries()">
+      <option value="">Select Country</option>
     </select>
 
-    <select id="carrier" class="w-full p-2 rounded text-black">
+    <!-- Carrier -->
+    <select id="carrier" class="w-full p-2 rounded text-black" onclick="loadCarriers()">
       <option value="">Select Carrier</option>
-      <option value="619">Carrier 619</option>
-      <option value="401">Carrier 401</option>
     </select>
 
+    <!-- Buttons -->
     <button onclick="generateNumber()" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-2 rounded text-white font-bold">📱 Generate Number</button>
     <button onclick="checkOtp()" class="w-full bg-gradient-to-r from-green-500 to-teal-600 px-4 py-2 rounded text-white font-bold">🔑 Check OTP</button>
 
-    <div id="result" class="mt-4 p-3 bg-black rounded text-sm">No number generated yet</div>
+    <!-- Result -->
+    <div id="result" class="mt-4 p-3 bg-black rounded text-sm">No number yet</div>
     <button onclick="copyResult()" class="mt-2 px-4 py-2 bg-pink-600 rounded text-white">📋 Copy</button>
   </div>
 
-  <!-- Yeh tera fake.js call karega -->
+  <!-- fake.js include -->
   <script src="js/fake.js"></script>
 
   <script>
-    async function generateNumber() {
-      const app = document.getElementById("app").value;
-      const carrier = document.getElementById("carrier").value;
-      const result = document.getElementById("result");
+    async function loadCountries() {
+      const countrySelect = document.getElementById("country");
+      if (countrySelect.options.length > 1) return;
 
-      if (!app || !carrier) {
-        result.innerText = "⚠ Please select app & carrier";
-        return;
+      countrySelect.innerHTML = "<option>Loading...</option>";
+      try {
+        const countries = await handler("countries");
+        if (!countries || countries.length === 0) throw new Error("No countries found");
+        countrySelect.innerHTML = '<option value="">Select Country</option>';
+        countries.forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c.code;
+          opt.textContent = c.name;
+          countrySelect.appendChild(opt);
+        });
+      } catch (err) {
+        countrySelect.innerHTML = `<option class="error">❌ Error loading countries</option>`;
+        console.error(err);
       }
+    }
 
+    async function loadCarriers() {
+      const carrierSelect = document.getElementById("carrier");
+      if (carrierSelect.options.length > 1) return;
+
+      carrierSelect.innerHTML = "<option>Loading...</option>";
+      try {
+        const carriers = await handler("carriers");
+        if (!carriers || carriers.length === 0) throw new Error("No carriers found");
+        carrierSelect.innerHTML = '<option value="">Select Carrier</option>';
+        carriers.forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c.id;
+          opt.textContent = c.name;
+          carrierSelect.appendChild(opt);
+        });
+      } catch (err) {
+        carrierSelect.innerHTML = `<option class="error">❌ Error loading carriers</option>`;
+        console.error(err);
+      }
+    }
+
+    async function generateNumber() {
+      const result = document.getElementById("result");
       result.innerText = "⏳ Generating...";
-      const data = await handler("number", app, carrier); // fake.js function
-      result.innerText = JSON.stringify(data, null, 2);
+      try {
+        const data = await handler("number");
+        if (!data) throw new Error("No number returned");
+        result.innerText = JSON.stringify(data, null, 2);
+      } catch (err) {
+        result.innerHTML = `<span class="error">❌ Failed to generate number</span>`;
+        console.error(err);
+      }
     }
 
     async function checkOtp() {
       const result = document.getElementById("result");
       result.innerText = "⏳ Fetching OTP...";
-      const data = await handler("otp"); // fake.js function
-      result.innerText = JSON.stringify(data, null, 2);
+      try {
+        const data = await handler("otp");
+        if (!data) throw new Error("No OTP returned");
+        result.innerText = JSON.stringify(data, null, 2);
+      } catch (err) {
+        result.innerHTML = `<span class="error">❌ Failed to fetch OTP</span>`;
+        console.error(err);
+      }
     }
 
     function copyResult() {

@@ -1,283 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Kami Flex — Fake Number / OTP</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <title>Kami Flex 💎 Fake Number</title>
   <style>
-    /* small customizations */
-    .animated-text {
-      background: linear-gradient(270deg,#7e22ce,#db2777,#f59e0b,#10b981);
-      background-size: 800% 800%;
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #0f0f0f, #1a1a1a, #000);
+      color: #fff;
+      text-align: center;
+      min-height: 100vh;
+    }
+    header {
+      padding: 20px;
+      background: linear-gradient(90deg, #06f7d8, #ff00cc);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      animation: gradientMove 6s ease infinite;
-      font-family: "Poppins", sans-serif;
+      font-size: 32px;
+      font-weight: bold;
+      letter-spacing: 1px;
     }
-    @keyframes gradientMove {
-      0% { background-position: 0% 50% }
-      50% { background-position: 100% 50% }
-      100% { background-position: 0% 50% }
+    button {
+      background: linear-gradient(90deg, #06f7d8, #00c3ff);
+      border: none;
+      padding: 12px 25px;
+      margin: 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 18px;
+      color: #000;
+      font-weight: bold;
+      box-shadow: 0 0 12px rgba(6, 247, 216, 0.6);
+      transition: 0.3s;
     }
-    .glass { background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); }
-    .card-grad { background: linear-gradient(90deg, rgba(99,102,241,0.12), rgba(236,72,153,0.08)); }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(255, 0, 204, 0.6);
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+    }
+    .card {
+      flex: 1 1 400px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      padding: 20px;
+      border-radius: 18px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      text-align: left;
+      max-width: 500px;
+    }
+    .card h2 {
+      margin-top: 0;
+      font-size: 22px;
+      background: linear-gradient(90deg, #ffb347, #ff00cc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    ul li {
+      padding: 10px;
+      margin: 6px 0;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.08);
+      font-size: 16px;
+    }
+    .status {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #aaa;
+    }
   </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 text-gray-900 font-sans">
+<body>
+  <header>📱 Kami Flex 💎 Fake Number</header>
 
-  <!-- NAV -->
-  <header class="sticky top-0 z-50">
-    <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <div class="h-12 w-12 rounded-full bg-gradient-to-tr from-purple-500 via-pink-500 to-yellow-400 flex items-center justify-center shadow-lg">
-          <img src="images/logo.png" alt="Kami Flex" class="h-9 w-9 rounded-full object-cover" onerror="this.style.display='none'">
-        </div>
-        <h1 class="text-2xl font-extrabold animated-text">Kami Flex</h1>
-      </div>
+  <button onclick="generateNumber()">✨ Generate Number</button>
+  <button onclick="getOtps()">💬 Get OTPs</button>
 
-      <div class="flex items-center gap-3">
-        <button id="backBtn" class="px-3 py-2 rounded-lg bg-white/80 shadow hover:bg-white">⬅ Back</button>
-        <button id="copyAllBtn" class="px-3 py-2 rounded-lg bg-purple-600 text-white shadow hover:opacity-90">Copy Last</button>
-      </div>
+  <div class="container">
+    <div class="card">
+      <h2>📋 Generated Numbers</h2>
+      <ul id="numberList"></ul>
+      <div class="status" id="numStatus">No numbers yet</div>
     </div>
-  </header>
 
-  <!-- MAIN -->
-  <main class="max-w-5xl mx-auto px-6 py-10">
-    <section class="glass rounded-2xl p-8 shadow-xl border border-white/10 card-grad">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-        <div>
-          <h2 class="text-3xl md:text-4xl font-extrabold mb-1">📱 Fake Number & OTP</h2>
-          <p class="text-sm text-gray-700/80 max-w-xl">Use the Raazit proxy to request a temporary number or view OTP entries. No country/carrier selection — one-click calls to `/api/fake`.</p>
-        </div>
+    <div class="card">
+      <h2>🔐 OTP List</h2>
+      <ul id="otpList"></ul>
+      <div class="status" id="otpStatus">Click "Get OTPs" to load</div>
+    </div>
+  </div>
 
-        <div class="flex gap-3">
-          <button id="getNumber" class="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-pink-500 to-yellow-400 text-white font-semibold rounded-2xl shadow hover:scale-105 transform transition">Get Number</button>
-          <button id="getOtp" class="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold rounded-2xl shadow hover:scale-105 transform transition">Get OTP</button>
-        </div>
-      </div>
+  <script>
+    const numberListEl = document.getElementById("numberList");
+    const numStatusEl = document.getElementById("numStatus");
+    const otpListEl = document.getElementById("otpList");
+    const otpStatusEl = document.getElementById("otpStatus");
 
-      <!-- status / instructions -->
-      <div id="status" class="mt-6 text-sm text-gray-700/90">
-        Click <strong>Get Number</strong> to request a number (calls `?type=number`). Click <strong>Get OTP</strong> to list OTPs (calls `?type=otp`).
-      </div>
-
-      <!-- loading -->
-      <div id="loader" class="mt-6 hidden flex items-center gap-3 text-sm text-gray-700">
-        <svg class="animate-spin h-6 w-6 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-        </svg>
-        <div id="loaderText">Loading…</div>
-      </div>
-
-      <!-- error -->
-      <div id="error" class="mt-6 hidden text-red-600 font-semibold"></div>
-
-      <!-- result area -->
-      <div id="results" class="mt-6 grid gap-4"></div>
-    </section>
-  </main>
-
-  <footer class="max-w-5xl mx-auto px-6 py-6 text-center text-sm text-gray-600">
-    Kami Flex • © <span id="yr"></span>
-  </footer>
-
-<script>
-  // small helpers & state
-  const apiBase = '/api/fake'; // expects vercel function at this path
-  let lastResultText = '';
-
-  document.getElementById('yr').innerText = new Date().getFullYear();
-  const loader = document.getElementById('loader');
-  const loaderText = document.getElementById('loaderText');
-  const errorEl = document.getElementById('error');
-  const results = document.getElementById('results');
-
-  document.getElementById('backBtn').addEventListener('click', () => {
-    // go back to index if present, else history.back()
-    if (location.pathname.endsWith('fake-ui.html')) {
-      location.href = 'index.html';
-    } else {
-      history.back();
-    }
-  });
-
-  document.getElementById('copyAllBtn').addEventListener('click', () => {
-    if (!lastResultText) {
-      alert('Nothing to copy yet.');
-      return;
-    }
-    navigator.clipboard.writeText(lastResultText)
-      .then(()=> alert('Copied last result to clipboard'))
-      .catch(()=> alert('Copy failed'));
-  });
-
-  document.getElementById('getNumber').addEventListener('click', () => callApi('number'));
-  document.getElementById('getOtp').addEventListener('click', () => callApi('otp'));
-
-  async function callApi(type) {
-    clearUI();
-    showLoader('Requesting ' + (type==='number' ? 'number' : 'OTP list') + ' …');
-
-    try {
-      const resp = await fetch(`${apiBase}?type=${encodeURIComponent(type)}`, { method: 'GET' });
-      // non-OK -> show useful message
-      if (!resp.ok) {
-        const text = await resp.text().catch(()=>null);
-        throw new Error(`${resp.status} ${resp.statusText}${text ? ' — ' + text : ''}`);
+    // Daily reset logic
+    function checkReset() {
+      const today = new Date().toDateString();
+      const savedDate = localStorage.getItem("lastDate");
+      if (savedDate !== today) {
+        localStorage.setItem("lastDate", today);
+        localStorage.removeItem("numbers");
       }
-
-      // try parse JSON, fallback to text
-      let data;
-      const contentType = resp.headers.get('content-type') || '';
-      if (contentType.includes('application/json')) {
-        data = await resp.json();
-      } else {
-        const txt = await resp.text();
-        try { data = JSON.parse(txt); } catch { data = txt; }
-      }
-
-      renderResult(type, data);
-
-    } catch (err) {
-      showError('❌ Failed to fetch: ' + (err.message || err));
-    } finally {
-      hideLoader();
     }
-  }
+    checkReset();
 
-  function showLoader(text='Loading…') {
-    loaderText.innerText = text;
-    loader.classList.remove('hidden');
-  }
-  function hideLoader() { loader.classList.add('hidden'); }
-
-  function showError(msg) {
-    errorEl.innerText = msg;
-    errorEl.classList.remove('hidden');
-  }
-
-  function clearUI() {
-    errorEl.classList.add('hidden');
-    errorEl.innerText = '';
-    results.innerHTML = '';
-  }
-
-  function renderResult(type, data) {
-    // pretty formatting depending on data type
-    lastResultText = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
-
-    // header card
-    const header = document.createElement('div');
-    header.className = 'p-4 rounded-xl glass border border-white/6 flex items-start gap-4';
-    header.innerHTML = `
-      <div class="flex-1">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="text-lg font-bold">${type === 'number' ? 'Number Response' : 'OTP Response'}</h3>
-            <p class="text-sm text-gray-700/80">Raw result from <code>/api/fake?type=${type}</code></p>
-          </div>
-          <div class="text-sm text-gray-600">Time: ${new Date().toLocaleTimeString()}</div>
-        </div>
-      </div>
-    `;
-    results.appendChild(header);
-
-    // If data is an array or object, show cards for keys / items
-    if (Array.isArray(data)) {
-      if (data.length === 0) {
-        const empty = document.createElement('div');
-        empty.className = 'p-4 rounded-lg bg-white/5 text-center text-sm text-gray-700';
-        empty.innerText = 'No items returned.';
-        results.appendChild(empty);
+    // Load numbers from localStorage
+    function loadNumbers() {
+      numberListEl.innerHTML = "";
+      const nums = JSON.parse(localStorage.getItem("numbers") || "[]");
+      if (nums.length === 0) {
+        numStatusEl.textContent = "No numbers yet";
       } else {
-        data.forEach((item, idx) => {
-          const c = makeCard(item, idx+1);
-          results.appendChild(c);
+        numStatusEl.textContent = "";
+        nums.forEach(num => {
+          const li = document.createElement("li");
+          li.textContent = num;
+          numberListEl.appendChild(li);
         });
       }
-    } else if (typeof data === 'object' && data !== null) {
-      // if contains records array use it (the upstream earlier used data.records)
-      if (data.records && Array.isArray(data.records)) {
-        if (data.records.length === 0) {
-          const empty = document.createElement('div');
-          empty.className = 'p-4 rounded-lg bg-white/5 text-center text-sm text-gray-700';
-          empty.innerText = 'No records found.';
-          results.appendChild(empty);
-        } else {
-          data.records.forEach((r, i) => results.appendChild(makeCard(r, i+1)));
-        }
-      } else {
-        // single object: show key/values
-        results.appendChild(makeCard(data));
+    }
+    loadNumbers();
+
+    async function generateNumber() {
+      numStatusEl.textContent = "⏳ Generating number...";
+      try {
+        const res = await fetch("/api/fake?type=number");
+        const data = await res.json();
+        const num = data?.number || JSON.stringify(data);
+
+        const nums = JSON.parse(localStorage.getItem("numbers") || "[]");
+        nums.push(num);
+        localStorage.setItem("numbers", JSON.stringify(nums));
+        loadNumbers();
+
+        numStatusEl.textContent = "✅ Number added to list";
+      } catch (e) {
+        numStatusEl.textContent = "❌ Error: " + e.message;
       }
-    } else {
-      // plain string or unknown
-      const pre = document.createElement('pre');
-      pre.className = 'p-4 rounded-lg bg-black/40 text-sm text-white overflow-auto';
-      pre.innerText = typeof data === 'string' ? data : String(data);
-      results.appendChild(pre);
     }
 
-    // add action row: copy / download JSON
-    const actions = document.createElement('div');
-    actions.className = 'mt-3 flex gap-3';
-    actions.innerHTML = `
-      <button id="copyBtn" class="px-4 py-2 rounded-lg bg-purple-600 text-white shadow">📋 Copy JSON</button>
-      <button id="downloadBtn" class="px-4 py-2 rounded-lg bg-white/90">⬇ Download</button>
-    `;
-    results.appendChild(actions);
+    async function getOtps() {
+      otpStatusEl.textContent = "⏳ Loading OTPs...";
+      otpListEl.innerHTML = "";
+      try {
+        const res = await fetch("/api/fake?type=otp");
+        const data = await res.json();
 
-    document.getElementById('copyBtn').addEventListener('click', () => {
-      navigator.clipboard.writeText(lastResultText)
-        .then(()=> alert('JSON copied'))
-        .catch(()=> alert('Copy failed'));
-    });
-
-    document.getElementById('downloadBtn').addEventListener('click', () => {
-      const blob = new Blob([lastResultText], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${type}-response-${Date.now()}.json`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    });
-  }
-
-  function makeCard(item, idx) {
-    const card = document.createElement('div');
-    card.className = 'p-4 rounded-xl bg-white/5 border border-white/6';
-    if (typeof item === 'string' || typeof item === 'number') {
-      card.innerHTML = `<div class="font-medium">#${idx ?? ''}</div><pre class="mt-2 text-sm text-white">${item}</pre>`;
-      return card;
+        if (Array.isArray(data) && data.length > 0) {
+          otpStatusEl.textContent = "";
+          data.forEach(item => {
+            const li = document.createElement("li");
+            li.textContent = item.otp || JSON.stringify(item);
+            otpListEl.appendChild(li);
+          });
+        } else {
+          otpStatusEl.textContent = "⚠️ No OTPs found";
+        }
+      } catch (e) {
+        otpStatusEl.textContent = "❌ Error: " + e.message;
+      }
     }
-    // show key-values
-    let html = `<div class="flex items-center justify-between"><div class="font-semibold">#${idx ?? ''}</div><div class="text-xs text-gray-500">object</div></div><div class="mt-3 grid gap-2">`;
-    Object.keys(item).forEach(k => {
-      const v = item[k] === null ? 'null' : (typeof item[k] === 'object' ? JSON.stringify(item[k]) : String(item[k]));
-      html += `<div class="flex justify-between items-start gap-3 p-2 bg-black/20 rounded">
-                 <div class="text-sm text-gray-200 font-medium">${escapeHtml(k)}</div>
-                 <div class="text-sm text-gray-100 break-words text-right">${escapeHtml(v)}</div>
-               </div>`;
-    });
-    html += `</div>`;
-    card.innerHTML = html;
-    return card;
-  }
-
-  // tiny HTML escape
-  function escapeHtml(s) {
-    return String(s)
-      .replaceAll('&', '&amp;')
-      .replaceAll('<','&lt;')
-      .replaceAll('>','&gt;');
-  }
-
-</script>
+  </script>
 </body>
 </html>

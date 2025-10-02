@@ -71,33 +71,23 @@
       overflow-y: auto;
     }
     ul li {
-      padding: 12px;
-      margin: 8px 0;
-      border-radius: 10px;
-      background: rgba(255,255,255,0.1);
-      font-size: 17px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-    ul li span {
-      font-weight: bold;
-      color: #06f7d8;
-      font-size: 18px;
+      padding: 10px;
+      margin: 6px 0;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.08);
+      font-size: 16px;
     }
     .copy-btn {
       background: #06f7d8;
       border: none;
-      padding: 6px 12px;
-      border-radius: 8px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
       font-size: 14px;
       font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .copy-btn:hover {
-      background: #ff00cc;
-      color: #fff;
     }
     .status {
       margin-top: 12px;
@@ -132,7 +122,7 @@
     const otpListEl = document.getElementById("otpList");
     const otpStatusEl = document.getElementById("otpStatus");
 
-    // Daily reset logic
+    // Reset numbers daily
     function checkReset() {
       const today = new Date().toDateString();
       const savedDate = localStorage.getItem("lastDate");
@@ -143,7 +133,6 @@
     }
     checkReset();
 
-    // Load numbers from localStorage
     function loadNumbers() {
       numberListEl.innerHTML = "";
       const nums = JSON.parse(localStorage.getItem("numbers") || "[]");
@@ -153,47 +142,75 @@
         numStatusEl.textContent = "";
         nums.forEach(num => {
           const li = document.createElement("li");
-          const span = document.createElement("span");
-          span.textContent = num;
+          li.textContent = num;
 
           const copyBtn = document.createElement("button");
-          copyBtn.textContent = "Copy";
+          copyBtn.textContent = "📋 Copy";
           copyBtn.className = "copy-btn";
-          copyBtn.onclick = () => copyNumber(num);
+          copyBtn.onclick = () => {
+            navigator.clipboard.writeText(num);
+            alert("✅ Number copied: " + num);
+          };
 
-          li.appendChild(span);
           li.appendChild(copyBtn);
-          numberListEl.appendChild(li);
+          numberListEl.insertBefore(li, numberListEl.firstChild);
         });
       }
     }
     loadNumbers();
 
+    function extractNumber(data) {
+      if (!data) return null;
+      if (typeof data === "object" && !Array.isArray(data)) {
+        return data.number || data.msisdn || data.phone || null;
+      }
+      if (Array.isArray(data) && data.length > 0) {
+        return data[0].number || data[0].msisdn || data[0].phone || null;
+      }
+      return null;
+    }
+
     async function generateNumber() {
       numStatusEl.textContent = "⏳ Generating number...";
       try {
-        const res = await fetch("/api/fake?type=number");
+        const res = await fetch("/api/fake?type=number&app=global--AF-93&carrier=619");
         const data = await res.json();
-        
-        // sirf number extract karna
-        const num = data?.number || data?.msisdn || data?.phone || null;
+        console.log("Number API Response:", data);
+
+        const num = extractNumber(data);
         if (!num) {
           numStatusEl.textContent = "❌ No number in response";
           return;
         }
 
-        // localStorage me save (TOP pe add hoga)
-        let nums = JSON.parse(localStorage.getItem("numbers") || "[]");
-        nums.unshift(num); // naya number upar
+        const nums = JSON.parse(localStorage.getItem("numbers") || "[]");
+        nums.unshift(num);
         localStorage.setItem("numbers", JSON.stringify(nums));
         loadNumbers();
 
-        // Auto copy
-        await navigator.clipboard.writeText(num);
-        numStatusEl.textContent = `✅ ${num} copied & added to list`;
+        // Auto copy new number
+        navigator.clipboard.writeText(num);
+        numStatusEl.textContent = "✅ Number generated & copied!";
       } catch (e) {
         numStatusEl.textContent = "❌ Error: " + e.message;
       }
+    }
+
+    function extractOtps(data) {
+      const otps = [];
+      if (Array.isArray(data)) {
+        data.forEach(item => {
+          if (item.otp) otps.push(item.otp);
+          else if (item.code) otps.push(item.code);
+          else if (typeof item === "string" && /\d{4,8}/.test(item)) {
+            otps.push(item.match(/\d{4,8}/)[0]);
+          }
+        });
+      } else if (typeof data === "object") {
+        if (data.otp) otps.push(data.otp);
+        else if (data.code) otps.push(data.code);
+      }
+      return otps;
     }
 
     async function getOtps() {
@@ -202,13 +219,15 @@
       try {
         const res = await fetch("/api/fake?type=otp");
         const data = await res.json();
+        console.log("OTP API Response:", data);
 
-        if (Array.isArray(data) && data.length > 0) {
+        const otps = extractOtps(data);
+        if (otps.length > 0) {
           otpStatusEl.textContent = "";
-          data.forEach(item => {
+          otps.forEach(otp => {
             const li = document.createElement("li");
-            li.textContent = item.otp || JSON.stringify(item);
-            otpListEl.appendChild(li);
+            li.textContent = otp;
+            otpListEl.insertBefore(li, otpListEl.firstChild);
           });
         } else {
           otpStatusEl.textContent = "⚠️ No OTPs found";
@@ -216,12 +235,6 @@
       } catch (e) {
         otpStatusEl.textContent = "❌ Error: " + e.message;
       }
-    }
-
-    function copyNumber(num) {
-      navigator.clipboard.writeText(num).then(() => {
-        numStatusEl.textContent = `📋 ${num} copied to clipboard`;
-      });
     }
   </script>
 </body>

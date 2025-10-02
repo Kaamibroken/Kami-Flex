@@ -25,15 +25,25 @@ async function handler(type, app, carrier) {
       form.append('filter[3][name]', 'countries');
       form.append('filter[3][value]', '0');
       form.append('search', '');
-      response = await fetch('https://raazit.acchub.io/api/', { method: 'POST', headers, body: form.toString() });
+      response = await fetch('https://raazit.acchub.io/api/', {
+        method: 'POST',
+        headers,
+        body: form.toString(),
+      });
     } else if (type === 'number') {
-      if (!app || !carrier) {
-        return { error: 'app & carrier required' };
-      }
+      // ✅ Default values agar frontend se na mile
+      const appId = app || 'global--AF-93';
+      const carrierId = carrier || '619';
+
       const form = new URLSearchParams();
-      form.append('app', app);
-      form.append('carrier', carrier);
-      response = await fetch('https://raazit.acchub.io/api/sms/', { method: 'POST', headers, body: form.toString() });
+      form.append('app', appId);
+      form.append('carrier', carrierId);
+
+      response = await fetch('https://raazit.acchub.io/api/sms/', {
+        method: 'POST',
+        headers,
+        body: form.toString(),
+      });
     } else {
       return { error: 'Invalid type' };
     }

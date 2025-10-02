@@ -71,11 +71,33 @@
       overflow-y: auto;
     }
     ul li {
-      padding: 10px;
-      margin: 6px 0;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      font-size: 17px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    ul li span {
+      font-weight: bold;
+      color: #06f7d8;
+      font-size: 18px;
+    }
+    .copy-btn {
+      background: #06f7d8;
+      border: none;
+      padding: 6px 12px;
       border-radius: 8px;
-      background: rgba(255,255,255,0.08);
-      font-size: 16px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .copy-btn:hover {
+      background: #ff00cc;
+      color: #fff;
     }
     .status {
       margin-top: 12px;
@@ -131,7 +153,16 @@
         numStatusEl.textContent = "";
         nums.forEach(num => {
           const li = document.createElement("li");
-          li.textContent = num;
+          const span = document.createElement("span");
+          span.textContent = num;
+
+          const copyBtn = document.createElement("button");
+          copyBtn.textContent = "Copy";
+          copyBtn.className = "copy-btn";
+          copyBtn.onclick = () => copyNumber(num);
+
+          li.appendChild(span);
+          li.appendChild(copyBtn);
           numberListEl.appendChild(li);
         });
       }
@@ -143,14 +174,23 @@
       try {
         const res = await fetch("/api/fake?type=number");
         const data = await res.json();
-        const num = data?.number || JSON.stringify(data);
+        
+        // sirf number extract karna
+        const num = data?.number || data?.msisdn || data?.phone || null;
+        if (!num) {
+          numStatusEl.textContent = "❌ No number in response";
+          return;
+        }
 
-        const nums = JSON.parse(localStorage.getItem("numbers") || "[]");
-        nums.push(num);
+        // localStorage me save (TOP pe add hoga)
+        let nums = JSON.parse(localStorage.getItem("numbers") || "[]");
+        nums.unshift(num); // naya number upar
         localStorage.setItem("numbers", JSON.stringify(nums));
         loadNumbers();
 
-        numStatusEl.textContent = "✅ Number added to list";
+        // Auto copy
+        await navigator.clipboard.writeText(num);
+        numStatusEl.textContent = `✅ ${num} copied & added to list`;
       } catch (e) {
         numStatusEl.textContent = "❌ Error: " + e.message;
       }
@@ -176,6 +216,12 @@
       } catch (e) {
         otpStatusEl.textContent = "❌ Error: " + e.message;
       }
+    }
+
+    function copyNumber(num) {
+      navigator.clipboard.writeText(num).then(() => {
+        numStatusEl.textContent = `📋 ${num} copied to clipboard`;
+      });
     }
   </script>
 </body>

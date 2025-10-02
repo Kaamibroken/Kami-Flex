@@ -1,9 +1,20 @@
 {
-  "name": "kami-flex-fake",
+  "name": "bunny-broken-sim-database",
   "version": "1.0.0",
-  "description": "Kami Flex Fake Number API with Vercel",
+  "description": "⚡ Bunny Broken 💔 SIM Database API using Express",
+  "main": "fake.js",
+  "type": "module",
   "scripts": {
-    "start": "vercel dev"
+    "start": "node fake.js",
+    "dev": "nodemon fake.js"
   },
+  "dependencies": {
+    "express": "^4.19.2",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "author": "Bunny Broken",
   "license": "MIT"
 }

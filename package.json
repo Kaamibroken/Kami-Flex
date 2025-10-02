@@ -1,20 +1,12 @@
 {
-  "name": "bunny-broken-sim-database",
+  "name": "kami-flex-fake-api",
   "version": "1.0.0",
-  "description": "⚡ Bunny Broken 💔 SIM Database API using Express",
-  "main": "fake.js",
-  "type": "module",
-  "scripts": {
-    "start": "node fake.js",
-    "dev": "nodemon fake.js"
-  },
+  "main": "api/fake.js",
+  "license": "MIT",
   "dependencies": {
-    "express": "^4.19.2",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^2.6.12"
   },
-  "devDependencies": {
-    "nodemon": "^3.1.0"
-  },
-  "author": "Bunny Broken",
-  "license": "MIT"
+  "engines": {
+    "node": "18.x"
+  }
 }

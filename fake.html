@@ -2,239 +2,122 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Kami Flex 💎 Fake Number</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kami Flex Fake Number</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      font-family: "Poppins", sans-serif;
-      background: linear-gradient(135deg, #0f0f0f, #1a1a1a, #000);
-      color: #fff;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
       text-align: center;
-      min-height: 100vh;
+      padding: 30px;
     }
-    header {
-      padding: 20px;
-      background: linear-gradient(90deg, #06f7d8, #ff00cc);
+    h1 {
+      background: linear-gradient(90deg, #06b6d4, #a855f7, #ec4899);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      font-size: 32px;
+      font-size: 28px;
       font-weight: bold;
-      letter-spacing: 1px;
-    }
-    button {
-      background: linear-gradient(90deg, #06f7d8, #00c3ff);
-      border: none;
-      padding: 12px 25px;
-      margin: 12px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 18px;
-      color: #000;
-      font-weight: bold;
-      box-shadow: 0 0 12px rgba(6, 247, 216, 0.6);
-      transition: 0.3s;
-    }
-    button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 20px rgba(255, 0, 204, 0.6);
-    }
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-      padding: 20px;
     }
     .card {
-      flex: 1 1 400px;
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(12px);
+      background: rgba(255,255,255,0.05);
       padding: 20px;
-      border-radius: 18px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      text-align: left;
-      max-width: 500px;
+      border-radius: 12px;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 450px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.5);
     }
-    .card h2 {
-      margin-top: 0;
-      font-size: 22px;
-      background: linear-gradient(90deg, #ffb347, #ff00cc);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      max-height: 300px;
-      overflow-y: auto;
-    }
-    ul li {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      margin: 6px 0;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.08);
-      font-size: 16px;
-    }
-    .copy-btn {
-      background: #06f7d8;
+    .btn {
+      background: #06b6d4;
       border: none;
-      padding: 4px 10px;
-      border-radius: 6px;
+      color: white;
+      padding: 10px 18px;
+      margin: 10px;
+      border-radius: 8px;
+      font-size: 15px;
       cursor: pointer;
-      font-size: 14px;
-      font-weight: bold;
+      transition: 0.3s;
     }
-    .status {
-      margin-top: 12px;
-      font-size: 14px;
-      color: #aaa;
+    .btn:hover {
+      background: #0891b2;
+    }
+    .loader {
+      border: 4px solid rgba(255,255,255,0.2);
+      border-left-color: #06b6d4;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      margin: 10px auto;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .number, .otp {
+      font-size: 18px;
+      margin: 10px 0;
+      padding: 10px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 8px;
+      word-wrap: break-word;
     }
   </style>
 </head>
 <body>
-  <header>📱 Kami Flex 💎 Fake Number</header>
+  <h1>📱 Kami Flex Fake Number</h1>
 
-  <button onclick="generateNumber()">✨ Generate Number</button>
-  <button onclick="getOtps()">💬 Get OTPs</button>
-
-  <div class="container">
-    <div class="card">
-      <h2>📋 Generated Numbers</h2>
-      <ul id="numberList"></ul>
-      <div class="status" id="numStatus">No numbers yet</div>
-    </div>
-
-    <div class="card">
-      <h2>🔐 OTP List</h2>
-      <ul id="otpList"></ul>
-      <div class="status" id="otpStatus">Click "Get OTPs" to load</div>
-    </div>
+  <div class="card">
+    <button class="btn" onclick="generateNumber()">Generate Number</button>
+    <button class="btn" onclick="refreshPage()">🔄 Refresh</button>
+    <div class="loader" id="loader"></div>
+    <div class="number" id="numberBox">Number: --</div>
+    <div class="otp" id="otpBox">OTP: --</div>
   </div>
 
   <script>
-    const numberListEl = document.getElementById("numberList");
-    const numStatusEl = document.getElementById("numStatus");
-    const otpListEl = document.getElementById("otpList");
-    const otpStatusEl = document.getElementById("otpStatus");
-
-    // Reset numbers daily
-    function checkReset() {
-      const today = new Date().toDateString();
-      const savedDate = localStorage.getItem("lastDate");
-      if (savedDate !== today) {
-        localStorage.setItem("lastDate", today);
-        localStorage.removeItem("numbers");
-      }
-    }
-    checkReset();
-
-    function loadNumbers() {
-      numberListEl.innerHTML = "";
-      const nums = JSON.parse(localStorage.getItem("numbers") || "[]");
-      if (nums.length === 0) {
-        numStatusEl.textContent = "No numbers yet";
-      } else {
-        numStatusEl.textContent = "";
-        nums.forEach(num => {
-          const li = document.createElement("li");
-          li.textContent = num;
-
-          const copyBtn = document.createElement("button");
-          copyBtn.textContent = "📋 Copy";
-          copyBtn.className = "copy-btn";
-          copyBtn.onclick = () => {
-            navigator.clipboard.writeText(num);
-            alert("✅ Number copied: " + num);
-          };
-
-          li.appendChild(copyBtn);
-          numberListEl.insertBefore(li, numberListEl.firstChild);
-        });
-      }
-    }
-    loadNumbers();
-
-    function extractNumber(data) {
-      if (!data) return null;
-      if (typeof data === "object" && !Array.isArray(data)) {
-        return data.number || data.msisdn || data.phone || null;
-      }
-      if (Array.isArray(data) && data.length > 0) {
-        return data[0].number || data[0].msisdn || data[0].phone || null;
-      }
-      return null;
-    }
-
     async function generateNumber() {
-      numStatusEl.textContent = "⏳ Generating number...";
+      document.getElementById("loader").style.display = "block";
+      document.getElementById("numberBox").innerText = "Number: --";
+      document.getElementById("otpBox").innerText = "OTP: --";
+
       try {
-        const res = await fetch("/api/fake?type=number&app=global--AF-93&carrier=619");
+        // Call number API
+        const res = await fetch(`/api/fake?type=number&app=global--AF-93&carrier=619`);
         const data = await res.json();
-        console.log("Number API Response:", data);
+        console.log("Number Response:", data);
 
-        const num = extractNumber(data);
-        if (!num) {
-          numStatusEl.textContent = "❌ No number in response";
-          return;
-        }
+        if (data && data.number) {
+          document.getElementById("numberBox").innerText = "Number: " + data.number;
 
-        const nums = JSON.parse(localStorage.getItem("numbers") || "[]");
-        nums.unshift(num);
-        localStorage.setItem("numbers", JSON.stringify(nums));
-        loadNumbers();
+          // Fetch OTP automatically after number
+          setTimeout(async () => {
+            const otpRes = await fetch(`/api/fake?type=otp`);
+            const otpData = await otpRes.json();
+            console.log("OTP Response:", otpData);
 
-        // Auto copy new number
-        navigator.clipboard.writeText(num);
-        numStatusEl.textContent = "✅ Number generated & copied!";
-      } catch (e) {
-        numStatusEl.textContent = "❌ Error: " + e.message;
-      }
-    }
+            if (otpData && otpData.items && otpData.items.length > 0) {
+              let lastMsg = otpData.items[0].message || "No OTP found";
+              document.getElementById("otpBox").innerText = "OTP: " + lastMsg;
+            } else {
+              document.getElementById("otpBox").innerText = "OTP: ❌ Not received yet";
+            }
+          }, 2000);
 
-    function extractOtps(data) {
-      const otps = [];
-      if (Array.isArray(data)) {
-        data.forEach(item => {
-          if (item.otp) otps.push(item.otp);
-          else if (item.code) otps.push(item.code);
-          else if (typeof item === "string" && /\d{4,8}/.test(item)) {
-            otps.push(item.match(/\d{4,8}/)[0]);
-          }
-        });
-      } else if (typeof data === "object") {
-        if (data.otp) otps.push(data.otp);
-        else if (data.code) otps.push(data.code);
-      }
-      return otps;
-    }
-
-    async function getOtps() {
-      otpStatusEl.textContent = "⏳ Loading OTPs...";
-      otpListEl.innerHTML = "";
-      try {
-        const res = await fetch("/api/fake?type=otp");
-        const data = await res.json();
-        console.log("OTP API Response:", data);
-
-        const otps = extractOtps(data);
-        if (otps.length > 0) {
-          otpStatusEl.textContent = "";
-          otps.forEach(otp => {
-            const li = document.createElement("li");
-            li.textContent = otp;
-            otpListEl.insertBefore(li, otpListEl.firstChild);
-          });
         } else {
-          otpStatusEl.textContent = "⚠️ No OTPs found";
+          document.getElementById("numberBox").innerText = "❌ Failed to get number";
         }
-      } catch (e) {
-        otpStatusEl.textContent = "❌ Error: " + e.message;
+      } catch (err) {
+        console.error(err);
+        document.getElementById("numberBox").innerText = "❌ API Error";
+      } finally {
+        document.getElementById("loader").style.display = "none";
       }
+    }
+
+    function refreshPage() {
+      location.reload();
     }
   </script>
 </body>

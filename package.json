@@ -1,12 +1,10 @@
 {
   "name": "kami-flex-fake-api",
   "version": "1.0.0",
+  "description": "Kami Flex Fake API with number & otp fetch",
   "main": "api/fake.js",
   "license": "MIT",
   "dependencies": {
     "node-fetch": "^2.6.12"
-  },
-  "engines": {
-    "node": "18.x"
   }
 }

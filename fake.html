@@ -2,26 +2,69 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Kami Flex 💎 Fake Number</title>
+  <title>📱 Kami Flex 💎 Tamasha Portal</title>
   <style>
+    /* ==== Global ==== */
     body {
       margin: 0;
       padding: 0;
       font-family: "Poppins", sans-serif;
-      background: linear-gradient(135deg, #0f0f0f, #1a1a1a, #000);
+      background: linear-gradient(135deg, #0d0d0d, #1a1a1a, #000000);
       color: #fff;
-      text-align: center;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     header {
+      width: 100%;
       padding: 20px;
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
       background: linear-gradient(90deg, #06f7d8, #ff00cc);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      font-size: 32px;
-      font-weight: bold;
-      letter-spacing: 1px;
+      letter-spacing: 2px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.8);
     }
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      padding: 20px;
+      margin: 20px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.6);
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+    }
+    .card h2 {
+      margin: 0 0 20px;
+      font-size: 24px;
+      background: linear-gradient(90deg, #ffb347, #ff00cc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* ==== Input ==== */
+    input {
+      width: 80%;
+      padding: 12px;
+      margin: 12px 0;
+      border: none;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 18px;
+      outline: none;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+    }
+    input::placeholder {
+      color: #bbb;
+    }
+
+    /* ==== Buttons ==== */
     button {
       background: linear-gradient(90deg, #06f7d8, #00c3ff);
       border: none;
@@ -29,7 +72,7 @@
       margin: 12px;
       border-radius: 12px;
       cursor: pointer;
-      font-size: 18px;
+      font-size: 16px;
       color: #000;
       font-weight: bold;
       box-shadow: 0 0 12px rgba(6, 247, 216, 0.6);
@@ -39,111 +82,148 @@
       transform: scale(1.05);
       box-shadow: 0 0 20px rgba(255, 0, 204, 0.6);
     }
-    .card {
-      margin: 20px auto;
-      padding: 20px;
-      background: rgba(255,255,255,0.05);
-      backdrop-filter: blur(12px);
-      border-radius: 18px;
-      max-width: 500px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      text-align: left;
+
+    /* ==== Packages ==== */
+    .pkg-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
     }
-    .card h2 {
-      margin-top: 0;
-      font-size: 22px;
-      background: linear-gradient(90deg, #ffb347, #ff00cc);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .pkg-btn {
+      flex: 1 1 200px;
+      background: linear-gradient(90deg, #ff00cc, #06f7d8);
+      color: #fff;
+      padding: 15px;
+      font-size: 18px;
+      border-radius: 15px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 0 15px rgba(255, 0, 204, 0.6);
+      transition: 0.3s;
     }
+    .pkg-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 25px rgba(6, 247, 216, 0.9);
+    }
+
+    /* ==== Status & Details ==== */
     .status {
-      margin-top: 12px;
+      margin-top: 15px;
+      font-size: 14px;
+      color: #aaa;
+    }
+    #pkgDetails {
+      margin-top: 20px;
+      text-align: left;
+      background: rgba(255,255,255,0.08);
+      padding: 15px;
+      border-radius: 12px;
       font-size: 16px;
-      color: #ddd;
     }
   </style>
 </head>
 <body>
-  <header>📱 Kami Flex 💎 Fake Number</header>
+  <header>🎭 Kami Flex 💎 Tamasha Portal</header>
 
-  <button onclick="generateNumber()">✨ Generate Number</button>
-  <button onclick="getOtps()">💬 Get OTPs</button>
-
-  <div class="card">
-    <h2>📋 Latest Number</h2>
-    <div id="numberBox" class="status">No number yet</div>
+  <!-- Phone Input -->
+  <div class="card" id="phoneCard">
+    <h2>📱 Enter Jazz Number</h2>
+    <input type="text" id="phoneInput" placeholder="03XXXXXXXXX">
+    <button onclick="sendOtp()">📩 Send OTP</button>
+    <div class="status" id="phoneStatus">Enter your Jazz number to continue</div>
   </div>
 
-  <div class="card">
-    <h2>🔐 Latest OTP</h2>
-    <div id="otpBox" class="status">Click "Get OTPs"</div>
+  <!-- OTP Verification -->
+  <div class="card" id="otpCard" style="display:none;">
+    <h2>🔐 Verify OTP</h2>
+    <input type="text" id="otpInput" placeholder="Enter 4-digit OTP">
+    <button onclick="verifyOtp()">✅ Verify OTP</button>
+    <div class="status" id="otpStatus">OTP will be sent to your number</div>
+  </div>
+
+  <!-- Packages -->
+  <div class="card" id="pkgCard" style="display:none;">
+    <h2>🎬 Available Packages</h2>
+    <div class="pkg-buttons">
+      <button class="pkg-btn" onclick="getPackage('1day')">📆 1 Day Package</button>
+      <button class="pkg-btn" onclick="getPackage('7day')">📆 7 Day Package</button>
+      <button class="pkg-btn" onclick="getPackage('30day')">📆 30 Day Package</button>
+      <button class="pkg-btn" onclick="getPackage('special')">🚀 Data Special</button>
+    </div>
+    <div id="pkgDetails">Select a package to view details</div>
   </div>
 
   <script>
-    function extractNumber(obj) {
-      if (!obj) return null;
-      if (typeof obj === "string" && obj.match(/[0-9]{6,15}/)) return obj;
-
-      if (obj.number) return obj.number;
-      if (obj.msisdn) return obj.msisdn;
-      if (obj.phone) return obj.phone;
-
-      if (Array.isArray(obj)) {
-        for (let item of obj) {
-          let n = extractNumber(item);
-          if (n) return n;
-        }
+    // Send OTP
+    async function sendOtp() {
+      const phone = document.getElementById("phoneInput").value.trim();
+      const status = document.getElementById("phoneStatus");
+      if (!/^03\d{9}$/.test(phone)) {
+        status.textContent = "❌ Invalid number format!";
+        return;
       }
-      if (typeof obj === "object") {
-        for (let key in obj) {
-          let n = extractNumber(obj[key]);
-          if (n) return n;
-        }
-      }
-      return null;
-    }
-
-    async function generateNumber() {
-      const numberBox = document.getElementById("numberBox");
-      numberBox.textContent = "⏳ Generating...";
-
+      status.textContent = "⏳ Sending OTP...";
       try {
-        const res = await fetch(`/api/fake?type=number&app=global--AF-93&carrier=619`);
+        const res = await fetch(`/api/tamasha?type=sendOtp&phone=${phone}`);
         const data = await res.json();
-        console.log("Number Response:", data);
-
-        let number = extractNumber(data);
-
-        if (number) {
-          numberBox.textContent = "📞 " + number;
-          navigator.clipboard.writeText(number).then(() => {
-            numberBox.textContent += " (✅ Copied)";
-          });
+        if (data.success) {
+          status.textContent = "✅ OTP sent to your number!";
+          document.getElementById("phoneCard").style.display = "none";
+          document.getElementById("otpCard").style.display = "block";
         } else {
-          numberBox.textContent = "❌ No number in response";
+          status.textContent = "❌ Failed: " + data.message;
         }
-      } catch (err) {
-        numberBox.textContent = "❌ Error: " + err.message;
+      } catch (e) {
+        status.textContent = "❌ Error: " + e.message;
       }
     }
 
-    async function getOtps() {
-      const otpBox = document.getElementById("otpBox");
-      otpBox.textContent = "⏳ Loading OTPs...";
-
+    // Verify OTP
+    async function verifyOtp() {
+      const otp = document.getElementById("otpInput").value.trim();
+      const status = document.getElementById("otpStatus");
+      if (!/^\d{4}$/.test(otp)) {
+        status.textContent = "❌ Enter valid 4-digit OTP!";
+        return;
+      }
+      status.textContent = "⏳ Verifying OTP...";
       try {
-        const res = await fetch(`/api/fake?type=otp`);
+        const res = await fetch(`/api/tamasha?type=verifyOtp&otp=${otp}`);
         const data = await res.json();
-        console.log("OTP Response:", data);
-
-        let otp = null;
-        if (data.items && data.items.length > 0) {
-          otp = data.items[0].otp || data.items[0].message || null;
+        if (data.success) {
+          status.textContent = "✅ OTP Verified!";
+          document.getElementById("otpCard").style.display = "none";
+          document.getElementById("pkgCard").style.display = "block";
+        } else {
+          status.textContent = "❌ Verification Failed: " + data.message;
         }
+      } catch (e) {
+        status.textContent = "❌ Error: " + e.message;
+      }
+    }
 
-        otpBox.textContent = otp ? "🔐 " + otp : "⚠️ No OTP yet";
-      } catch (err) {
-        otpBox.textContent = "❌ Error: " + err.message;
+    // Get Package
+    async function getPackage(type) {
+      const pkgBox = document.getElementById("pkgDetails");
+      pkgBox.innerHTML = "⏳ Loading package details...";
+      try {
+        const res = await fetch(`/api/tamasha?type=package&pkg=${type}`);
+        const data = await res.json();
+        if (data.name) {
+          pkgBox.innerHTML = `
+            <h3>${data.name}</h3>
+            <p>💰 Price: ${data.price}</p>
+            <p>📅 Validity: ${data.validity}</p>
+            <p>📖 ${data.description}</p>
+          `;
+        } else {
+          pkgBox.innerHTML = "⚠️ No package data found";
+        }
+      } catch (e) {
+        pkgBox.innerHTML = "❌ Error: " + e.message;
       }
     }
   </script>

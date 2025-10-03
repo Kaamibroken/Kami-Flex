@@ -7,7 +7,5 @@
     "start": "node tamasha.js"
   },
   "dependencies": {
-    "node-fetch": "^3.3.2"
-  },
-  "type": "module"
+  }
 }

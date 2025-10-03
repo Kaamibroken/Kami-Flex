@@ -1,66 +1,122 @@
+// api/tamasha.js
 const fetch = require('node-fetch');
 
-const AUTH_TOKEN = 'f5f67281-417e-4925-b74b-e86de2eee205';
+const API_BASE = process.env.TAMASHA_API_BASE || 'https://jazztv.pk/alpha/api_gateway/index.php/v3/users-dbss';
+const HEADER_TOKEN = process.env.TAMASHA_HEADER_TOKEN || '774a719yycaa6xc44bg12e5hf5buj69dmkcdt46dl';
 
-async function handler(type, app, carrier) {
-  const headers = {
-    'auth-token': AUTH_TOKEN,
-    'X-Requested-With': 'XMLHttpRequest',
-    'User-Agent': 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/140 Mobile Safari/537.36',
-    'Accept': 'application/json, text/javascript, */*; q=0.01',
-    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+function getHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${HEADER_TOKEN}`,
+    'User-Agent': 'Mozilla/5.0 (compatible; KamiFlex/1.0)',
+    'Accept': 'application/json',
+    'Origin': 'http://portal.tamashaweb.com',
+    'Referer': 'http://portal.tamashaweb.com/'
   };
-
-  try {
-    let response;
-    if (type === 'otp') {
-      const form = new URLSearchParams();
-      form.append('page_no', '1');
-      form.append('filter[0][name]', 'filter_status');
-      form.append('filter[0][value]', '');
-      form.append('filter[1][name]', 'filter_items');
-      form.append('filter[1][value]', '20');
-      form.append('filter[2][name]', 'app_id');
-      form.append('filter[2][value]', '0');
-      form.append('filter[3][name]', 'countries');
-      form.append('filter[3][value]', '0');
-      form.append('search', '');
-      response = await fetch('https://raazit.acchub.io/api/', {
-        method: 'POST',
-        headers,
-        body: form.toString(),
-      });
-    } else if (type === 'number') {
-      // ✅ Default values agar frontend se na mile
-      const appId = app || 'global--AF-93';
-      const carrierId = carrier || '619';
-
-      const form = new URLSearchParams();
-      form.append('app', appId);
-      form.append('carrier', carrierId);
-
-      response = await fetch('https://raazit.acchub.io/api/sms/', {
-        method: 'POST',
-        headers,
-        body: form.toString(),
-      });
-    } else {
-      return { error: 'Invalid type' };
-    }
-
-    const text = await response.text();
-    try {
-      return JSON.parse(text);
-    } catch {
-      return { raw: text };
-    }
-  } catch (err) {
-    return { error: 'Upstream failed', detail: err.message };
-  }
 }
 
+// Sample fallback packages
+const SAMPLE_PACKAGES = [
+  { id: "1", name: "Daily Offer", price: "Rs. 10/day", description: "Daily subscription package" },
+  { id: "2", name: "Weekly Offer", price: "Rs. 70/week", description: "Weekly subscription package" },
+  { id: "3", name: "Monthly Prepaid", price: "Rs. 300/month", description: "Monthly package for prepaid users" },
+  { id: "4", name: "Monthly Postpaid", price: "Rs. 120/month", description: "Monthly package for postpaid users" }
+];
+
 module.exports = async (req, res) => {
-  const { type, app, carrier } = req.query;
-  const result = await handler(type, app, carrier);
-  res.status(200).json(result);
+  // ✅ CORS setup
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  const action = (req.query.action || (req.body && req.body.action) || 'packages').toString();
+
+  try {
+    // 📦 Get Packages
+    if (action === 'packages') {
+      try {
+        const upstream = await fetch(`${API_BASE}/packages`, {
+          method: 'GET',
+          headers: getHeaders(),
+          timeout: 10000
+        });
+        const text = await upstream.text();
+        try {
+          const json = JSON.parse(text);
+          return res.status(200).json({ ok: true, upstream: true, data: json });
+        } catch {
+          return res.status(200).json({ ok: true, upstream: false, data: SAMPLE_PACKAGES });
+        }
+      } catch {
+        return res.status(200).json({ ok: true, upstream: false, data: SAMPLE_PACKAGES, note: 'Upstream unreachable' });
+      }
+    }
+
+    // 📲 Send OTP
+    else if (action === 'send_otp') {
+      const body = req.method === 'GET' ? req.query : req.body || {};
+      const phone = (body.phone || '').toString().trim();
+      if (!phone) return res.status(400).json({ ok: false, error: 'phone required' });
+
+      const formatted = phone.startsWith('0') ? `92${phone.slice(1)}` : (phone.startsWith('92') ? phone : `92${phone}`);
+      const payload = { msisdn: formatted, network: 'jazz', action: 'send_otp' };
+
+      try {
+        const upstream = await fetch(`${API_BASE}/sign-up-wc`, {
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify(payload),
+          timeout: 15000
+        });
+        const text = await upstream.text();
+        try {
+          return res.status(200).json({ ok: true, upstream: true, data: JSON.parse(text) });
+        } catch {
+          return res.status(200).json({ ok: true, upstream: true, data: text });
+        }
+      } catch (err) {
+        return res.status(502).json({ ok: false, error: 'Upstream failed', detail: err.message });
+      }
+    }
+
+    // 🔑 Verify OTP
+    else if (action === 'verify_otp') {
+      const body = req.method === 'GET' ? req.query : req.body || {};
+      const phone = (body.phone || '').toString().trim();
+      const otp = (body.otp || '').toString().trim();
+      if (!phone || !otp) return res.status(400).json({ ok: false, error: 'phone & otp required' });
+
+      const formatted = phone.startsWith('0') ? `92${phone.slice(1)}` : (phone.startsWith('92') ? phone : `92${phone}`);
+      const payload = { msisdn: formatted, network: 'jazz', otp, action: 'verify_otp' };
+
+      try {
+        const upstream = await fetch(`${API_BASE}/sign-up-wc`, {
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify(payload),
+          timeout: 15000
+        });
+        const text = await upstream.text();
+        try {
+          return res.status(200).json({ ok: true, upstream: true, data: JSON.parse(text) });
+        } catch {
+          return res.status(200).json({ ok: true, upstream: true, data: text });
+        }
+      } catch (err) {
+        return res.status(502).json({ ok: false, error: 'Upstream failed', detail: err.message });
+      }
+    }
+
+    // ❌ Invalid Action
+    else {
+      return res.status(400).json({ ok: false, error: 'invalid action (packages|send_otp|verify_otp)' });
+    }
+  } catch (e) {
+    console.error('Handler error', e);
+    return res.status(500).json({ ok: false, error: 'internal server error', detail: e.message });
+  }
 };

@@ -1,4 +1,3 @@
-// api/tamasha.js
 const fetch = require('node-fetch');
 
 const API_BASE = process.env.TAMASHA_API_BASE || 'https://jazztv.pk/alpha/api_gateway/index.php/v3/users-dbss';
@@ -15,16 +14,15 @@ function getHeaders() {
   };
 }
 
-// Sample fallback packages
+// Agar packages API fail ho jaye to yeh fallback data return hoga
 const SAMPLE_PACKAGES = [
-  { id: "1", name: "Daily Offer", price: "Rs. 10/day", description: "Daily subscription package" },
-  { id: "2", name: "Weekly Offer", price: "Rs. 70/week", description: "Weekly subscription package" },
-  { id: "3", name: "Monthly Prepaid", price: "Rs. 300/month", description: "Monthly package for prepaid users" },
-  { id: "4", name: "Monthly Postpaid", price: "Rs. 120/month", description: "Monthly package for postpaid users" }
+  { id: "1", name: "📅 Daily Offer", price: "Rs. 10/day", description: "1 Day Streaming Package" },
+  { id: "2", name: "📅 Weekly Offer", price: "Rs. 70/week", description: "7 Days Streaming Package" },
+  { id: "3", name: "📅 Monthly Prepaid", price: "Rs. 300/month", description: "30 Days Package (Prepaid)" },
+  { id: "4", name: "📅 Data Special", price: "Rs. 120/3 Days", description: "Special Data Package" }
 ];
 
 module.exports = async (req, res) => {
-  // ✅ CORS setup
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -33,30 +31,27 @@ module.exports = async (req, res) => {
     return res.status(200).end();
   }
 
-  const action = (req.query.action || (req.body && req.body.action) || 'packages').toString();
+  const action = (req.query.action || (req.body && req.body.action) || '').toString();
 
   try {
-    // 📦 Get Packages
     if (action === 'packages') {
       try {
         const upstream = await fetch(`${API_BASE}/packages`, {
           method: 'GET',
-          headers: getHeaders(),
-          timeout: 10000
+          headers: getHeaders()
         });
         const text = await upstream.text();
         try {
           const json = JSON.parse(text);
-          return res.status(200).json({ ok: true, upstream: true, data: json });
+          return res.status(200).json({ ok: true, data: json });
         } catch {
-          return res.status(200).json({ ok: true, upstream: false, data: SAMPLE_PACKAGES });
+          return res.status(200).json({ ok: true, data: SAMPLE_PACKAGES });
         }
       } catch {
-        return res.status(200).json({ ok: true, upstream: false, data: SAMPLE_PACKAGES, note: 'Upstream unreachable' });
+        return res.status(200).json({ ok: true, data: SAMPLE_PACKAGES });
       }
     }
 
-    // 📲 Send OTP
     else if (action === 'send_otp') {
       const body = req.method === 'GET' ? req.query : req.body || {};
       const phone = (body.phone || '').toString().trim();
@@ -65,25 +60,19 @@ module.exports = async (req, res) => {
       const formatted = phone.startsWith('0') ? `92${phone.slice(1)}` : (phone.startsWith('92') ? phone : `92${phone}`);
       const payload = { msisdn: formatted, network: 'jazz', action: 'send_otp' };
 
+      const upstream = await fetch(`${API_BASE}/sign-up-wc`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify(payload)
+      });
+      const text = await upstream.text();
       try {
-        const upstream = await fetch(`${API_BASE}/sign-up-wc`, {
-          method: 'POST',
-          headers: getHeaders(),
-          body: JSON.stringify(payload),
-          timeout: 15000
-        });
-        const text = await upstream.text();
-        try {
-          return res.status(200).json({ ok: true, upstream: true, data: JSON.parse(text) });
-        } catch {
-          return res.status(200).json({ ok: true, upstream: true, data: text });
-        }
-      } catch (err) {
-        return res.status(502).json({ ok: false, error: 'Upstream failed', detail: err.message });
+        return res.status(200).json({ ok: true, data: JSON.parse(text) });
+      } catch {
+        return res.status(200).json({ ok: true, data: text });
       }
     }
 
-    // 🔑 Verify OTP
     else if (action === 'verify_otp') {
       const body = req.method === 'GET' ? req.query : req.body || {};
       const phone = (body.phone || '').toString().trim();
@@ -93,30 +82,23 @@ module.exports = async (req, res) => {
       const formatted = phone.startsWith('0') ? `92${phone.slice(1)}` : (phone.startsWith('92') ? phone : `92${phone}`);
       const payload = { msisdn: formatted, network: 'jazz', otp, action: 'verify_otp' };
 
+      const upstream = await fetch(`${API_BASE}/sign-up-wc`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify(payload)
+      });
+      const text = await upstream.text();
       try {
-        const upstream = await fetch(`${API_BASE}/sign-up-wc`, {
-          method: 'POST',
-          headers: getHeaders(),
-          body: JSON.stringify(payload),
-          timeout: 15000
-        });
-        const text = await upstream.text();
-        try {
-          return res.status(200).json({ ok: true, upstream: true, data: JSON.parse(text) });
-        } catch {
-          return res.status(200).json({ ok: true, upstream: true, data: text });
-        }
-      } catch (err) {
-        return res.status(502).json({ ok: false, error: 'Upstream failed', detail: err.message });
+        return res.status(200).json({ ok: true, data: JSON.parse(text) });
+      } catch {
+        return res.status(200).json({ ok: true, data: text });
       }
     }
 
-    // ❌ Invalid Action
     else {
-      return res.status(400).json({ ok: false, error: 'invalid action (packages|send_otp|verify_otp)' });
+      return res.status(400).json({ ok: false, error: 'invalid action' });
     }
   } catch (e) {
-    console.error('Handler error', e);
-    return res.status(500).json({ ok: false, error: 'internal server error', detail: e.message });
+    return res.status(500).json({ ok: false, error: e.message });
   }
 };

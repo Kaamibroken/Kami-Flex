@@ -2,12 +2,12 @@
   "version": 2,
   "builds": [
     { "src": "index.html", "use": "@vercel/static" },
-    { "src": "fake.js", "use": "@vercel/node" },
-    { "src": "fake.html", "use": "@vercel/static" }
+    { "src": "tamasha.js", "use": "@vercel/node" },
+    { "src": "tamasha.html", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "/", "dest": "/index.html" },
-    { "src": "/api/(.*)", "dest": "/fake.js" },
-    { "src": "/", "dest": "/fake.html" }
+    { "src": "/api/(.*)", "dest": "/tamasha.js" },
+    { "src": "/", "dest": "/tamasha.html" }
   ]
 }

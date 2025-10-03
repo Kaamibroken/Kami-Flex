@@ -2,117 +2,229 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kami Flex Tamasha 💙</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>📱 Kami Flex 💎 Tamasha Portal</title>
+  <style>
+    /* ==== Global ==== */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #0d0d0d, #1a1a1a, #000000);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      width: 100%;
+      padding: 20px;
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
+      background: linear-gradient(90deg, #06f7d8, #ff00cc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.8);
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      padding: 20px;
+      margin: 20px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.6);
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+    }
+    .card h2 {
+      margin: 0 0 20px;
+      font-size: 24px;
+      background: linear-gradient(90deg, #ffb347, #ff00cc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* ==== Input ==== */
+    input {
+      width: 80%;
+      padding: 12px;
+      margin: 12px 0;
+      border: none;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 18px;
+      outline: none;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+    }
+    input::placeholder {
+      color: #bbb;
+    }
+
+    /* ==== Buttons ==== */
+    button {
+      background: linear-gradient(90deg, #06f7d8, #00c3ff);
+      border: none;
+      padding: 12px 25px;
+      margin: 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 16px;
+      color: #000;
+      font-weight: bold;
+      box-shadow: 0 0 12px rgba(6, 247, 216, 0.6);
+      transition: 0.3s;
+    }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(255, 0, 204, 0.6);
+    }
+
+    /* ==== Packages ==== */
+    .pkg-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .pkg-btn {
+      flex: 1 1 200px;
+      background: linear-gradient(90deg, #ff00cc, #06f7d8);
+      color: #fff;
+      padding: 15px;
+      font-size: 18px;
+      border-radius: 15px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 0 15px rgba(255, 0, 204, 0.6);
+      transition: 0.3s;
+    }
+    .pkg-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 25px rgba(6, 247, 216, 0.9);
+    }
+
+    /* ==== Status & Details ==== */
+    .status {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #aaa;
+    }
+    #pkgDetails {
+      margin-top: 20px;
+      text-align: left;
+      background: rgba(255,255,255,0.08);
+      padding: 15px;
+      border-radius: 12px;
+      font-size: 16px;
+    }
+  </style>
 </head>
-<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen">
+<body>
+  <header>🎭 Kami Flex 💎 Tamasha Portal</header>
 
-  <h1 class="text-3xl font-bold text-cyan-400 mb-6">📺 Kami Flex Tamasha</h1>
-
-  <!-- Phone + OTP Section -->
-  <div id="authSection" class="p-6 bg-gray-800 rounded-2xl shadow-lg w-96">
-    <input id="phoneInput" type="text" placeholder="📱 Enter Mobile (03xxxxxxxxx)"
-      class="w-full p-3 rounded-lg text-black mb-3" />
-    <button onclick="sendOtp()"
-      class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 rounded-lg">
-      Send OTP
-    </button>
-
-    <div id="otpBox" class="hidden mt-4">
-      <input id="otpInput" type="text" placeholder="🔑 Enter OTP"
-        class="w-full p-3 rounded-lg text-black mb-3" />
-      <button onclick="verifyOtp()"
-        class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded-lg">
-        Verify OTP
-      </button>
-    </div>
-
-    <p id="authResult" class="mt-3 text-sm text-red-400"></p>
+  <!-- Phone Input -->
+  <div class="card" id="phoneCard">
+    <h2>📱 Enter Jazz Number</h2>
+    <input type="text" id="phoneInput" placeholder="03XXXXXXXXX">
+    <button onclick="sendOtp()">📩 Send OTP</button>
+    <div class="status" id="phoneStatus">Enter your Jazz number to continue</div>
   </div>
 
-  <!-- Packages Section -->
-  <div id="packagesSection" class="hidden mt-6 w-full max-w-lg p-6 bg-gray-800 rounded-2xl shadow-lg">
-    <h2 class="text-xl font-semibold mb-4 text-cyan-300">🎁 Available Packages</h2>
-    <div id="packagesList" class="space-y-3"></div>
+  <!-- OTP Verification -->
+  <div class="card" id="otpCard" style="display:none;">
+    <h2>🔐 Verify OTP</h2>
+    <input type="text" id="otpInput" placeholder="Enter 4-digit OTP">
+    <button onclick="verifyOtp()">✅ Verify OTP</button>
+    <div class="status" id="otpStatus">OTP will be sent to your number</div>
+  </div>
+
+  <!-- Packages -->
+  <div class="card" id="pkgCard" style="display:none;">
+    <h2>🎬 Available Packages</h2>
+    <div class="pkg-buttons">
+      <button class="pkg-btn" onclick="getPackage('1day')">📆 1 Day Package</button>
+      <button class="pkg-btn" onclick="getPackage('7day')">📆 7 Day Package</button>
+      <button class="pkg-btn" onclick="getPackage('30day')">📆 30 Day Package</button>
+      <button class="pkg-btn" onclick="getPackage('special')">🚀 Data Special</button>
+    </div>
+    <div id="pkgDetails">Select a package to view details</div>
   </div>
 
   <script>
+    // Send OTP
     async function sendOtp() {
-      const phone = document.getElementById("phoneInput").value;
-      const res = await fetch(`/api/tamasha?action=send_otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone })
-      });
-      const data = await res.json();
-      if (data.ok) {
-        document.getElementById("authResult").innerText = "✅ OTP Sent!";
-        document.getElementById("otpBox").classList.remove("hidden");
-      } else {
-        document.getElementById("authResult").innerText = "❌ Failed to send OTP";
+      const phone = document.getElementById("phoneInput").value.trim();
+      const status = document.getElementById("phoneStatus");
+      if (!/^03\d{9}$/.test(phone)) {
+        status.textContent = "❌ Invalid number format!";
+        return;
       }
-    }
-
-    async function verifyOtp() {
-      const phone = document.getElementById("phoneInput").value;
-      const otp = document.getElementById("otpInput").value;
-      const res = await fetch(`/api/tamasha?action=verify_otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, otp })
-      });
-      const data = await res.json();
-      if (data.ok) {
-        document.getElementById("authResult").innerText = "✅ OTP Verified!";
-        document.getElementById("authSection").classList.add("hidden");
-        document.getElementById("packagesSection").classList.remove("hidden");
-        loadPackages();
-      } else {
-        document.getElementById("authResult").innerText = "❌ Wrong OTP";
-      }
-    }
-
-    async function loadPackages() {
-      const list = document.getElementById("packagesList");
-      list.innerHTML = "";
-
+      status.textContent = "⏳ Sending OTP...";
       try {
-        const res = await fetch(`/api/tamasha?action=packages`);
+        const res = await fetch(`/api/tamasha?type=sendOtp&phone=${phone}`);
         const data = await res.json();
-
-        if (data.ok && data.data && data.data.length > 0) {
-          data.data.forEach(pkg => {
-            const div = document.createElement("div");
-            div.className = "p-4 bg-gray-700 rounded-lg";
-            div.innerText = `${pkg.name} - ${pkg.price}`;
-            list.appendChild(div);
-          });
+        if (data.success) {
+          status.textContent = "✅ OTP sent to your number!";
+          document.getElementById("phoneCard").style.display = "none";
+          document.getElementById("otpCard").style.display = "block";
         } else {
-          showFallbackPackages();
+          status.textContent = "❌ Failed: " + data.message;
         }
-      } catch (err) {
-        showFallbackPackages();
+      } catch (e) {
+        status.textContent = "❌ Error: " + e.message;
       }
     }
 
-    function showFallbackPackages() {
-      const list = document.getElementById("packagesList");
-      list.innerHTML = "";
+    // Verify OTP
+    async function verifyOtp() {
+      const otp = document.getElementById("otpInput").value.trim();
+      const status = document.getElementById("otpStatus");
+      if (!/^\d{4}$/.test(otp)) {
+        status.textContent = "❌ Enter valid 4-digit OTP!";
+        return;
+      }
+      status.textContent = "⏳ Verifying OTP...";
+      try {
+        const res = await fetch(`/api/tamasha?type=verifyOtp&otp=${otp}`);
+        const data = await res.json();
+        if (data.success) {
+          status.textContent = "✅ OTP Verified!";
+          document.getElementById("otpCard").style.display = "none";
+          document.getElementById("pkgCard").style.display = "block";
+        } else {
+          status.textContent = "❌ Verification Failed: " + data.message;
+        }
+      } catch (e) {
+        status.textContent = "❌ Error: " + e.message;
+      }
+    }
 
-      const fallback = [
-        { name: "1 Day Package", price: "Rs. 10/day" },
-        { name: "7 Day Package", price: "Rs. 70/week" },
-        { name: "30 Day Package", price: "Rs. 300/month" },
-        { name: "Data Special", price: "Rs. 120/month" }
-      ];
-
-      fallback.forEach(pkg => {
-        const div = document.createElement("div");
-        div.className = "p-4 bg-gray-700 rounded-lg";
-        div.innerText = `${pkg.name} - ${pkg.price}`;
-        list.appendChild(div);
-      });
+    // Get Package
+    async function getPackage(type) {
+      const pkgBox = document.getElementById("pkgDetails");
+      pkgBox.innerHTML = "⏳ Loading package details...";
+      try {
+        const res = await fetch(`/api/tamasha?type=package&pkg=${type}`);
+        const data = await res.json();
+        if (data.name) {
+          pkgBox.innerHTML = `
+            <h3>${data.name}</h3>
+            <p>💰 Price: ${data.price}</p>
+            <p>📅 Validity: ${data.validity}</p>
+            <p>📖 ${data.description}</p>
+          `;
+        } else {
+          pkgBox.innerHTML = "⚠️ No package data found";
+        }
+      } catch (e) {
+        pkgBox.innerHTML = "❌ Error: " + e.message;
+      }
     }
   </script>
 </body>

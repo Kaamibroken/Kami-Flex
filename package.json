@@ -1,8 +1,13 @@
 {
-  "name": "kami-flex-fake",
+  "name": "tamasha-app",
   "version": "1.0.0",
+  "description": "Kami Flex Tamasha 💙 API and Frontend",
+  "main": "tamasha.js",
+  "scripts": {
+    "start": "node tamasha.js"
+  },
   "dependencies": {
-    "node-fetch": "^2.6.7"
-  }
+    "node-fetch": "^3.3.2"
+  },
+  "type": "module"
 }
-
